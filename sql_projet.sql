@@ -72,9 +72,8 @@ CREATE TABLE Mois(
 CREATE TABLE Traitement(
    Id_traitement INT AUTO_INCREMENT NOT NULL ,
    Libellé VARCHAR(20),
-   Id_Actions INT NOT NULL,
+   Id_Actions INT,
    PRIMARY KEY(Id_traitement),
-   UNIQUE(Id_Actions),
    FOREIGN KEY(Id_Actions) REFERENCES Actions(Id_Actions)
 );
 
@@ -152,7 +151,8 @@ INSERT INTO Actions (Libellé) VALUES
 ('Vider'),
 ('Ajouter'),
 ('Signale'),
-('Nettoyer');
+('Nettoyer'),
+('Applique');
 
 INSERT INTO Compost (Taille, Localisation) VALUES
 ('12','B4'),
@@ -177,10 +177,12 @@ INSERT INTO Défaut(Libellé , Id_Actions) VALUES
 ('Tuteur cassé' , 5),
 ('Maladie' , 5);
 
-INSERT INTO Traitement (Libellé, Id_Actions) VALUES
+INSERT INTO Traitement(Libellé, Id_Actions) VALUES
 ('Engrais' , 7),
-('Arrosage' , 7),
-('Désherber', 6);
+('Désherbant' , 7),
+('Arrosage' , 7);
 
 -- REQUETES
+SELECT * FROM Actions;
 SELECT * FROM Défaut;
+SELECT * FROM Traitement;
