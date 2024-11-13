@@ -177,5 +177,10 @@ INSERT INTO Défaut(Libellé , Id_Actions) VALUES
 ('Tuteur cassé' , 5),
 ('Maladie' , 5);
 
+INSERT INTO Traitement (Libellé, Id_Actions) VALUES
+('Engrais' , 7),
+('Arrosage' , 7),
+('Désherber', 6);
+
 -- REQUETES
 SELECT * FROM Défaut;
