@@ -51,7 +51,7 @@ CREATE TABLE Actions(
 CREATE TABLE Défaut(
    Id_Défaut INT AUTO_INCREMENT NOT NULL,
    Libellé VARCHAR(20),
-   Id_Actions INT NOT NULL,
+   Id_Actions INT,
    PRIMARY KEY(Id_Défaut),
    FOREIGN KEY(Id_Actions) REFERENCES Actions(Id_Actions)
 );
@@ -172,13 +172,10 @@ INSERT INTO Mois (Libellé) VALUES
 ('Novembre'),
 ('Décembre');
 
-
--- AJOUT DES DONNÉES DANS LES ASSOCIATIONS
-
-INSERT INTO Défaut (Libellé, Id_Actions)
-SELECT Défaut.Libellé , Actions.Id_Actions
-FROM Actions
-WHERE (Actions.Libellé LIKE 'Signale');
+INSERT INTO Défaut(Libellé , Id_Actions) VALUES
+('Pot cassé' , 5),
+('Tuteur cassé' , 5),
+('Maladie' , 5);
 
 -- REQUETES
-SELECT * FROM Mois;
+SELECT * FROM Défaut;
