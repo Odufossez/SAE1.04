@@ -8,7 +8,6 @@ drop table if exists Mois;
 drop table if exists Compost;
 drop table if exists Défaut;
 drop table if exists Actions;
-drop table if exists Dates;
 drop table if exists Parcelle;
 drop table if exists Fruits_Légumes_et_aromate;
 drop table if exists Adhérent;
@@ -38,11 +37,6 @@ CREATE TABLE Parcelle(
 
     PRIMARY KEY(Id_Parcelle),
     FOREIGN KEY(plante_id) REFERENCES Fruits_Légumes_et_aromate(Id_FruitLégume)
-);
-
-CREATE TABLE Dates(
-    JJ_MM_AAAA DATE,
-    PRIMARY KEY(JJ_MM_AAAA)
 );
 
 CREATE TABLE Actions(
