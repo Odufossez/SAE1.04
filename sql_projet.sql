@@ -1,6 +1,5 @@
 -- SUPPRESSION DES TABLES
 drop table if exists Fait;
-drop table if exists Pousse_dans;
 drop table if exists Entretient;
 drop table if exists Attendre;
 drop table if exists Pousse;
@@ -10,8 +9,8 @@ drop table if exists Compost;
 drop table if exists Défaut;
 drop table if exists Actions;
 drop table if exists Dates;
-drop table if exists Fruits_Légumes_et_aromate;
 drop table if exists Parcelle;
+drop table if exists Fruits_Légumes_et_aromate;
 drop table if exists Adhérent;
 
 -- CREATION DES TABLES
@@ -133,7 +132,7 @@ CREATE TABLE Fait(
 );
 
 -- AJOUT DES DONNÉES DANS LES TABLES
-INSERT INTO Adhérent (Nom, Prénom, Adresse, Téléphone) VALUES
+INSERT INTO Adhérent (Nom, Prenom, Adresse, Téléphone) VALUES
 ('DUSSOL','Luca','Quelque part sur rien', '0612345561'),
 ('HETRU','Owen','La-bas','0698765432'),
 ('DUFOSSEZ','Oscar','Près de là','0630893144');
@@ -188,6 +187,7 @@ INSERT INTO Traitement(Libellé, Id_Actions) VALUES
 ('Arrosage' , 7);
 
 -- REQUETES
+SHOW tables ;
 SELECT * FROM Actions;
 SELECT * FROM Défaut;
 SELECT * FROM Traitement;
