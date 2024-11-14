@@ -49,7 +49,7 @@ CREATE TABLE Actions(
 CREATE TABLE Défaut(
     Id_Défaut INT AUTO_INCREMENT NOT NULL,
     Libellé VARCHAR(20),
-    Id_Actions INT,
+    Id_Actions INT UNIQUE,
 
     PRIMARY KEY(Id_Défaut),
     FOREIGN KEY(Id_Actions) REFERENCES Actions(Id_Actions)
@@ -147,9 +147,11 @@ INSERT INTO Actions (Libellé) VALUES
 ('Récolter'),
 ('Vider'),
 ('Ajouter'),
-('Signale'),
 ('Nettoyer'),
-('Applique');
+('Applique'),
+('Pot cassé'),
+('Tuteur cassé'),
+('Maladie');
 
 INSERT INTO Compost (Taille, Localisation) VALUES
 ('12','B4'),
@@ -170,9 +172,9 @@ INSERT INTO Mois (Libellé) VALUES
 ('Décembre');
 
 INSERT INTO Défaut(Libellé , Id_Actions) VALUES
-('Pot cassé' , 5),
-('Tuteur cassé' , 5),
-('Maladie' , 5);
+('Pot cassé' , 7),
+('Tuteur cassé' , 8),
+('Maladie' , 9);
 
 INSERT INTO Traitement(Libellé, Id_Actions) VALUES
 ('Engrais' , 7),
@@ -192,7 +194,7 @@ INSERT INTO Entretient (Id_Adhérent, JJ_MM_AAAA, Id_Actions, Id_Compost, Quanti
 (2 , '2024_05_18' , 6 , 2 , 0);
 
 INSERT INTO Fait (Id_Adhérent, Id_Parcelle, JJ_MM_AAAA, Id_Actions, Quantité) VALUES
-(3 , 2 , '2024_05_07' , 7 , 0),
+(3 , 2 , '2024_05_07' , 8 , 0),
 (2 , 3 , '2024_05_10' , 1 , 0),
 (1 , 2 , '2024_06_28' , 2 , 3);
 
@@ -219,3 +221,22 @@ FROM Traitement
 right JOIN Actions ON Traitement.Id_Actions = Actions.Id_Actions
 where Actions.Libellé = 'Applique'
 ORDER BY Traitement.Libellé, Actions.Libellé;
+
+-- REQUETE 4 : MODIFIER UNE PLANTE
+SELECT * FROM Fruits_Légumes_et_aromate;
+
+UPDATE Fruits_Légumes_et_aromate
+SET Libellé = 'Pomme'
+WHERE Libellé LIKE 'Tomate';
+
+SELECT * FROM Fruits_Légumes_et_aromate;
+
+-- REQUETE 5 : SIGNALEMENT D'UN DÉFAUT & AFFICHAGE
+INSERT INTO Fait VALUE (3, 1 ,
+                        '2024_07_20' , 7 , 0);
+
+SELECT Parcelle.Id_Parcelle , Défaut.Libellé , Fait.JJ_MM_AAAA
+FROM Parcelle
+JOIN Fait on Parcelle.Id_Parcelle = Fait.Id_Parcelle
+JOIN Actions on Fait.Id_Actions = Actions.Id_Actions
+JOIN Défaut on Actions.Id_Actions = Défaut.Id_Actions;
