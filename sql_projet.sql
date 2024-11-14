@@ -97,6 +97,7 @@ CREATE TABLE Pousse(
 CREATE TABLE Attendre(
     Id_traitement INT ,
     Id_traitement_1 INT,
+    temps_attente VARCHAR(20),
 
     PRIMARY KEY(Id_traitement, Id_traitement_1),
     FOREIGN KEY(Id_traitement) REFERENCES Traitement(Id_traitement),
@@ -186,8 +187,21 @@ INSERT INTO Traitement(Libellé, Id_Actions) VALUES
 ('Désherbant' , 7),
 ('Arrosage' , 7);
 
+INSERT INTO Pousse (Id_FruitLégume, Id_Mois) VALUES
+(1 , 6),
+(4 , 5);
+
+INSERT INTO Attendre (Id_traitement, Id_traitement_1, temps_attente) VALUES
+(1 , 1 , 'Un mois'),
+(2 , 1 , '24 heures');
+
+INSERT INTO Entretient (Id_Adhérent, JJ_MM_AAAA, Id_Actions, Id_Compost, Quantité) VALUES
+(1 , 09/05/2024 , 4 , 1 , 2.5),
+(2 , 18/05/2024 , 6 , 2 , 0);
+
+INSERT INTO Fait (Id_Adhérent, Id_Parcelle, JJ_MM_AAAA, Id_Actions, Quantité) VALUES
+(3 , 2 , 07/05/2024 , 7 , 0),
+(2 , 4 , 10/05/2024 , 1 , 0);
+
+
 -- REQUETES
-SHOW tables ;
-SELECT * FROM Actions;
-SELECT * FROM Défaut;
-SELECT * FROM Traitement;
