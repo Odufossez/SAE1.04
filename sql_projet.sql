@@ -200,8 +200,11 @@ INSERT INTO Fait (Id_Adhérent, Id_Parcelle, JJ_MM_AAAA, Id_Actions, Quantité) 
 
 -- REQUETES ----------------
 -- REQUETE 1 : VOIR LES ACTIONS SUR LA PARCELLE 2
-SELECT Id_Adhérent, Id_Actions FROM Fait
-WHERE Id_Parcelle = 2;
+SELECT Adhérent.Prenom , Adhérent.Nom , Actions.Libellé
+FROM Adhérent
+JOIN Fait on Adhérent.Id_Adhérent = Fait.Id_Adhérent
+LEFT JOIN Actions on  Actions.Id_Actions = Fait.Id_Actions
+WHERE Fait.Id_Parcelle = 2;
 
 -- REQUETE 2 :
 select Fruits_Légumes_et_aromate.Libellé
