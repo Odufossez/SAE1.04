@@ -113,7 +113,6 @@ CREATE TABLE Entretient(
 
     PRIMARY KEY(Id_Adhérent, JJ_MM_AAAA, Id_Actions, Id_Compost),
     FOREIGN KEY(Id_Adhérent) REFERENCES Adhérent(Id_Adhérent),
-    FOREIGN KEY(JJ_MM_AAAA) REFERENCES Dates(JJ_MM_AAAA),
     FOREIGN KEY(Id_Actions) REFERENCES Actions(Id_Actions),
     FOREIGN KEY(Id_Compost) REFERENCES Compost(Id_Compost)
 );
@@ -128,7 +127,6 @@ CREATE TABLE Fait(
     PRIMARY KEY(Id_Adhérent, Id_Parcelle, JJ_MM_AAAA, Id_Actions),
     FOREIGN KEY(Id_Adhérent) REFERENCES Adhérent(Id_Adhérent),
     FOREIGN KEY(Id_Parcelle) REFERENCES Parcelle(Id_Parcelle),
-    FOREIGN KEY(JJ_MM_AAAA) REFERENCES Dates(JJ_MM_AAAA),
     FOREIGN KEY(Id_Actions) REFERENCES Actions(Id_Actions)
 );
 
@@ -196,12 +194,24 @@ INSERT INTO Attendre (Id_traitement, Id_traitement_1, temps_attente) VALUES
 (2 , 1 , '24 heures');
 
 INSERT INTO Entretient (Id_Adhérent, JJ_MM_AAAA, Id_Actions, Id_Compost, Quantité) VALUES
-(1 , 09/05/2024 , 4 , 1 , 2.5),
-(2 , 18/05/2024 , 6 , 2 , 0);
+(1 , '2024_05_09' , 4 , 1 , 2.5),
+(2 , '2024_05_18' , 6 , 2 , 0);
 
 INSERT INTO Fait (Id_Adhérent, Id_Parcelle, JJ_MM_AAAA, Id_Actions, Quantité) VALUES
-(3 , 2 , 07/05/2024 , 7 , 0),
-(2 , 4 , 10/05/2024 , 1 , 0);
+(3 , 2 , '2024_05_07' , 7 , 0),
+(2 , 3 , '2024_05_10' , 1 , 0),
+(1 , 2 , '2024_06_28' , 2 , 3);
 
 
--- REQUETES
+
+-- REQUETES ----------------
+-- REQUETE 1 : VOIR LES ACTIONS SUR LA PARCELLE 2
+SELECT Id_Adhérent, Id_Actions FROM Fait
+WHERE Id_Parcelle = 2;
+
+-- REQUETE 2 :
+select Fruits_Légumes_et_aromate.Libellé
+from Fruits_Légumes_et_aromate
+right join Parcelle on Fruits_Légumes_et_aromate.Id_FruitLégume = Parcelle.Id_Parcelle
+WHERE Parcelle.Id_Parcelle=2  -- "permet de choisir la parcelle"
+group by Fruits_Légumes_et_aromate.Libellé;
