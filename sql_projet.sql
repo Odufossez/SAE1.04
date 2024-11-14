@@ -206,9 +206,16 @@ JOIN Fait on Adhérent.Id_Adhérent = Fait.Id_Adhérent
 LEFT JOIN Actions on  Actions.Id_Actions = Fait.Id_Actions
 WHERE Fait.Id_Parcelle = 2;
 
--- REQUETE 2 :
+-- REQUETE 2 : VOIR LES PLANTES QUI ONT POUSSÉ SUR LA PARCELLE 2
 select Fruits_Légumes_et_aromate.Libellé
 from Fruits_Légumes_et_aromate
 right join Parcelle on Fruits_Légumes_et_aromate.Id_FruitLégume = Parcelle.Id_Parcelle
 WHERE Parcelle.Id_Parcelle=2  -- "permet de choisir la parcelle"
 group by Fruits_Légumes_et_aromate.Libellé;
+
+-- REQUETE 3 : VOIR LES TRAITEMENTS ET L'ACTION ASSOCIÉE
+SELECT  Traitement.Libellé, Actions.Libellé
+FROM Traitement
+right JOIN Actions ON Traitement.Id_Actions = Actions.Id_Actions
+where Actions.Libellé = 'Applique'
+ORDER BY Traitement.Libellé, Actions.Libellé;
