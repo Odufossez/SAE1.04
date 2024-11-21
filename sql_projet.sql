@@ -1,5 +1,5 @@
 -- SUPPRESSION DES TABLES
-drop table if exists Fait;
+drop table if exists Recolte;
 drop table if exists Entretient;
 drop table if exists Attendre;
 drop table if exists Pousse;
@@ -9,55 +9,54 @@ drop table if exists Compost;
 drop table if exists Défaut;
 drop table if exists Actions;
 drop table if exists Parcelle;
-drop table if exists Fruits_Légumes_et_aromate;
-drop table if exists Adhérent;
+drop table if exists Fruits_Legumes_et_aromate;
+drop table if exists Adherent;
 
 -- CREATION DES TABLES
-CREATE TABLE Adhérent(
-   Id_Adhérent INT AUTO_INCREMENT NOT NULL,
+CREATE TABLE Adherent(
+   Id_Adherent INT AUTO_INCREMENT NOT NULL,
    Nom VARCHAR(50),
    Prenom VARCHAR(50),
    Adresse VARCHAR(50),
-   Téléphone VARCHAR(10),
-   PRIMARY KEY(Id_Adhérent)
+   Telephone VARCHAR(10),
+   PRIMARY KEY(Id_Adherent)
 );
 
-CREATE TABLE Fruits_Légumes_et_aromate(
-    Id_FruitLégume INT AUTO_INCREMENT NOT NULL,
-    Libellé VARCHAR(20),
+CREATE TABLE Fruits_Legumes_et_aromate(
+    Id_FruitLegume INT AUTO_INCREMENT NOT NULL,
+    Libelle_FruitLegume VARCHAR(20),
 
-    PRIMARY KEY(Id_FruitLégume)
+    PRIMARY KEY(Id_FruitLegume)
 );
 
 CREATE TABLE Parcelle(
     Id_Parcelle INT AUTO_INCREMENT NOT NULL,
-    Longueur DECIMAL(4,2),
-    Largeur DECIMAL(4,2),
+    Surface NUMERIC(4,2),
     Plante_id INT,
 
     PRIMARY KEY(Id_Parcelle),
-    FOREIGN KEY(plante_id) REFERENCES Fruits_Légumes_et_aromate(Id_FruitLégume)
+    FOREIGN KEY(plante_id) REFERENCES Fruits_Legumes_et_aromate(Id_FruitLegume)
 );
 
 CREATE TABLE Actions(
     Id_Actions INT AUTO_INCREMENT NOT NULL,
-    Libellé VARCHAR(20),
+    Libelle_action VARCHAR(20),
 
     PRIMARY KEY(Id_Actions)
 );
 
 CREATE TABLE Défaut(
-    Id_Défaut INT AUTO_INCREMENT NOT NULL,
+    Id_Defaut INT AUTO_INCREMENT NOT NULL,
     Libellé VARCHAR(20),
     Id_Actions INT UNIQUE,
 
-    PRIMARY KEY(Id_Défaut),
+    PRIMARY KEY(Id_Defaut),
     FOREIGN KEY(Id_Actions) REFERENCES Actions(Id_Actions)
 );
 
 CREATE TABLE Compost(
     Id_Compost INT AUTO_INCREMENT NOT NULL ,
-    Taille VARCHAR(20),
+    Taille NUMERIC(4,2),
     Localisation VARCHAR(20),
 
     PRIMARY KEY(Id_Compost)
@@ -84,7 +83,7 @@ CREATE TABLE Pousse(
     Id_Mois INT,
 
     PRIMARY KEY(Id_FruitLégume, Id_Mois),
-    FOREIGN KEY(Id_FruitLégume) REFERENCES Fruits_Légumes_et_aromate(Id_FruitLégume),
+    FOREIGN KEY(Id_FruitLégume) REFERENCES Fruits_Legumes_et_aromate(Id_FruitLegume),
     FOREIGN KEY(Id_Mois) REFERENCES Mois(Id_Mois)
 );
 
@@ -99,50 +98,50 @@ CREATE TABLE Attendre(
 );
 
 CREATE TABLE Entretient(
-    Id_Adhérent INT,
+    Id_Adherent INT,
     JJ_MM_AAAA DATE,
     Id_Actions INT,
     Id_Compost INT,
-    Quantité DECIMAL(4,2),
+    Quantite DECIMAL(4,2),
 
-    PRIMARY KEY(Id_Adhérent, JJ_MM_AAAA, Id_Actions, Id_Compost),
-    FOREIGN KEY(Id_Adhérent) REFERENCES Adhérent(Id_Adhérent),
+    PRIMARY KEY(Id_Adherent, JJ_MM_AAAA, Id_Actions, Id_Compost),
+    FOREIGN KEY(Id_Adherent) REFERENCES Adherent(Id_Adherent),
     FOREIGN KEY(Id_Actions) REFERENCES Actions(Id_Actions),
     FOREIGN KEY(Id_Compost) REFERENCES Compost(Id_Compost)
 );
 
-CREATE TABLE Fait(
-    Id_Adhérent INT,
+CREATE TABLE Recolte(
+    Id_Adherent INT,
     Id_Parcelle INT,
     JJ_MM_AAAA DATE,
     Id_Actions INT,
-    Quantité DECIMAL(4,2),
+    Quantite DECIMAL(4,2),
 
-    PRIMARY KEY(Id_Adhérent, Id_Parcelle, JJ_MM_AAAA, Id_Actions),
-    FOREIGN KEY(Id_Adhérent) REFERENCES Adhérent(Id_Adhérent),
+    PRIMARY KEY(Id_Adherent, Id_Parcelle, JJ_MM_AAAA, Id_Actions),
+    FOREIGN KEY(Id_Adherent) REFERENCES Adherent(Id_Adherent),
     FOREIGN KEY(Id_Parcelle) REFERENCES Parcelle(Id_Parcelle),
     FOREIGN KEY(Id_Actions) REFERENCES Actions(Id_Actions)
 );
 
 -- AJOUT DES DONNÉES DANS LES TABLES
-INSERT INTO Adhérent (Nom, Prenom, Adresse, Téléphone) VALUES
+INSERT INTO Adherent (Nom, Prenom, Adresse, Telephone) VALUES
 ('DUSSOL','Luca','Quelque part sur rien', '0612345561'),
 ('HETRU','Owen','La-bas','0698765432'),
 ('DUFOSSEZ','Oscar','Près de là','0630893144');
 
-INSERT INTO Parcelle (Longueur, Largeur) VALUES
-(2.5,1),
-(3,2),
-(1.5,2);
+INSERT INTO Parcelle (Surface) VALUES
+(4),
+(3),
+(2.5);
 
-INSERT INTO Fruits_Légumes_et_aromate (Libellé) VALUES
+INSERT INTO Fruits_Legumes_et_aromate (Libelle_FruitLegume) VALUES
 ('Pastèque'),
 ('Persil'),
 ('Piment d espelette'),
 ('Tomate'),
 ('Pomme de terre');
 
-INSERT INTO Actions (Libellé) VALUES
+INSERT INTO Actions (Libelle_action) VALUES
 ('Planter'),
 ('Récolter'),
 ('Vider'),
@@ -154,8 +153,8 @@ INSERT INTO Actions (Libellé) VALUES
 ('Maladie');
 
 INSERT INTO Compost (Taille, Localisation) VALUES
-('12','B4'),
-('10','D4');
+(12,'B4'),
+(10,'D4');
 
 INSERT INTO Mois (Libellé) VALUES
 ('Janvier'),
@@ -189,11 +188,11 @@ INSERT INTO Attendre (Id_traitement, Id_traitement_1, temps_attente) VALUES
 (1 , 1 , 'Un mois'),
 (2 , 1 , '24 heures');
 
-INSERT INTO Entretient (Id_Adhérent, JJ_MM_AAAA, Id_Actions, Id_Compost, Quantité) VALUES
+INSERT INTO Entretient (Id_Adherent, JJ_MM_AAAA, Id_Actions, Id_Compost, Quantite)VALUES
 (1 , '2024_05_09' , 4 , 1 , 2.5),
 (2 , '2024_05_18' , 6 , 2 , 0);
 
-INSERT INTO Fait (Id_Adhérent, Id_Parcelle, JJ_MM_AAAA, Id_Actions, Quantité) VALUES
+INSERT INTO Recolte (Id_Adherent, Id_Parcelle, JJ_MM_AAAA, Id_Actions, Quantite) VALUES
 (3 , 2 , '2024_05_07' , 8 , 0),
 (2 , 3 , '2024_05_10' , 1 , 0),
 (1 , 2 , '2024_06_28' , 2 , 3);
@@ -202,41 +201,51 @@ INSERT INTO Fait (Id_Adhérent, Id_Parcelle, JJ_MM_AAAA, Id_Actions, Quantité) 
 
 -- REQUETES ----------------
 -- REQUETE 1 : VOIR LES ACTIONS SUR LA PARCELLE 2
-SELECT Adhérent.Prenom , Adhérent.Nom , Actions.Libellé
-FROM Adhérent
-JOIN Fait on Adhérent.Id_Adhérent = Fait.Id_Adhérent
-LEFT JOIN Actions on  Actions.Id_Actions = Fait.Id_Actions
-WHERE Fait.Id_Parcelle = 2;
+SELECT Adherent.Prenom , Adherent.Nom , Actions.Libelle_action
+FROM Adherent
+JOIN Recolte on Adherent.Id_Adherent = Recolte.Id_Adherent
+LEFT JOIN Actions on  Actions.Id_Actions = Recolte.Id_Actions
+WHERE Recolte.Id_Parcelle = 2;
 
 -- REQUETE 2 : VOIR LES PLANTES QUI ONT POUSSÉ SUR LA PARCELLE 2
-select Fruits_Légumes_et_aromate.Libellé
-from Fruits_Légumes_et_aromate
-right join Parcelle on Fruits_Légumes_et_aromate.Id_FruitLégume = Parcelle.Id_Parcelle
+select Fruits_Legumes_et_aromate.Libelle_FruitLegume
+from Fruits_Legumes_et_aromate
+right join Parcelle on Fruits_Legumes_et_aromate.Id_FruitLegume = Parcelle.Id_Parcelle
 WHERE Parcelle.Id_Parcelle=2  -- "permet de choisir la parcelle"
-group by Fruits_Légumes_et_aromate.Libellé;
+group by Fruits_Legumes_et_aromate.Libelle_FruitLegume;
 
 -- REQUETE 3 : VOIR LES TRAITEMENTS ET L'ACTION ASSOCIÉE
-SELECT  Traitement.Libellé, Actions.Libellé
+SELECT  Traitement.Libellé, Actions.Libelle_action
 FROM Traitement
 right JOIN Actions ON Traitement.Id_Actions = Actions.Id_Actions
-where Actions.Libellé = 'Applique'
-ORDER BY Traitement.Libellé, Actions.Libellé;
 
 -- REQUETE 4 : MODIFIER UNE PLANTE
-SELECT * FROM Fruits_Légumes_et_aromate;
+where Actions.Libelle_action = 'Applique'
+ORDER BY Traitement.Libellé, Actions.Libelle_action;
+SELECT * FROM Fruits_Legumes_et_aromate;
 
-UPDATE Fruits_Légumes_et_aromate
-SET Libellé = 'Pomme'
-WHERE Libellé LIKE 'Tomate';
+UPDATE Fruits_Legumes_et_aromate
+SET Libelle_FruitLegume = 'Pomme'
+WHERE Libelle_FruitLegume LIKE 'Tomate';
 
-SELECT * FROM Fruits_Légumes_et_aromate;
+SELECT * FROM Fruits_Legumes_et_aromate;
 
 -- REQUETE 5 : SIGNALEMENT D'UN DÉFAUT & AFFICHAGE
-INSERT INTO Fait VALUE (3, 1 ,
+INSERT INTO Recolte VALUE (3, 1 ,
                         '2024_07_20' , 7 , 0);
 
-SELECT Parcelle.Id_Parcelle , Défaut.Libellé , Fait.JJ_MM_AAAA
+SELECT Parcelle.Id_Parcelle , Défaut.Libellé , Recolte.JJ_MM_AAAA
 FROM Parcelle
-JOIN Fait on Parcelle.Id_Parcelle = Fait.Id_Parcelle
-JOIN Actions on Fait.Id_Actions = Actions.Id_Actions
+JOIN Recolte on Parcelle.Id_Parcelle = Recolte.Id_Parcelle
+JOIN Actions on Recolte.Id_Actions = Actions.Id_Actions
 JOIN Défaut on Actions.Id_Actions = Défaut.Id_Actions;
+
+
+-- AFFICHAGE DES RECOLTES AVEC NOM ADHERENT, ID PARCELLE , NOM ACTION , DATE RECOLTE , QTITÉ RAMASSÉE
+SELECT Adherent.Nom as Nom , Adherent.Prenom as Prénom , Recolte.Id_Parcelle as Parcelle , Recolte.JJ_MM_AAAA as Date ,
+       Libelle_FruitLegume as Plante, Recolte.Quantite as Quantité
+FROM Recolte
+LEFT JOIN Adherent on Recolte.Id_Adherent = Adherent.Id_Adherent
+RIGHT JOIN Fruits_Legumes_et_aromate on Id_Parcelle = Fruits_Legumes_et_aromate.Id_FruitLegume
+LEFT JOIN Actions on Recolte.Id_Actions = Actions.Id_Actions
+WHERE Actions.Id_Actions = 2

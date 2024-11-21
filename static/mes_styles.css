@@ -1,0 +1,81 @@
+.flashes {
+    padding: 5px;
+    margin : 5px;
+    background-color: green;
+    list-style-type: none;
+}
+
+table ,tr {
+  table-layout: fixed;
+  width: 100%;
+    height: 50px;
+  border-collapse: collapse;
+  border: 1px solid blue;
+  background-color: lightblue;
+}
+
+tr{
+    text-align: center;
+}
+
+a:not(.lien_tab, .lien_nav){
+    width:150px;
+    height: 30px;
+    background-color:cornflowerblue;
+    border: 1px mediumpurple groove ;
+    text-align:center;
+    vertical-align: middle;
+    padding: 5px;
+    margin : 5px;
+    border-radius: 15px;
+    color: black;
+    text-decoration: none;
+}
+
+.lien_tab, .lien_nav{
+    text-decoration: none;
+    color: darkblue;
+}
+
+a:hover{
+    background-color: grey;
+}
+
+.menu{
+    font-weight: bolder;
+}
+
+/* DISPLAY CARDS*/
+
+.display_enseignant{
+    display: grid;
+    grid-template-columns: 400px 400px 400px 400px;
+}
+
+.display_enseignant div{
+    margin-bottom: 10px;
+}
+
+.card{
+    border: 2px blue dotted;
+    padding-bottom: 10px;
+    background-color: lightgray;
+}
+
+.card-header{
+    font-weight: bolder;
+}
+
+/* FLASHES */
+
+.flashes {
+    padding: 5px;
+    margin : 5px;
+}
+
+.alert-warning {
+    background-color: rgba(255, 197, 197, 1);
+}
+.alert-success {
+    background-color: #bdfdbd;
+}
