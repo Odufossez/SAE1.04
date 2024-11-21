@@ -98,26 +98,28 @@ CREATE TABLE Attendre(
 );
 
 CREATE TABLE Entretient(
+    Id_Entretient INT NOT NULL AUTO_INCREMENT ,
     Id_Adherent INT,
     JJ_MM_AAAA DATE,
     Id_Actions INT,
     Id_Compost INT,
     Quantite DECIMAL(4,2),
 
-    PRIMARY KEY(Id_Adherent, JJ_MM_AAAA, Id_Actions, Id_Compost),
+    PRIMARY KEY(Id_Entretient),
     FOREIGN KEY(Id_Adherent) REFERENCES Adherent(Id_Adherent),
     FOREIGN KEY(Id_Actions) REFERENCES Actions(Id_Actions),
     FOREIGN KEY(Id_Compost) REFERENCES Compost(Id_Compost)
 );
 
 CREATE TABLE Recolte(
+    Id_Recolte INT NOT NULL AUTO_INCREMENT ,
     Id_Adherent INT,
     Id_Parcelle INT,
     JJ_MM_AAAA DATE,
     Id_Actions INT,
     Quantite DECIMAL(4,2),
 
-    PRIMARY KEY(Id_Adherent, Id_Parcelle, JJ_MM_AAAA, Id_Actions),
+    PRIMARY KEY(Id_Recolte),
     FOREIGN KEY(Id_Adherent) REFERENCES Adherent(Id_Adherent),
     FOREIGN KEY(Id_Parcelle) REFERENCES Parcelle(Id_Parcelle),
     FOREIGN KEY(Id_Actions) REFERENCES Actions(Id_Actions)
@@ -231,7 +233,7 @@ WHERE Libelle_FruitLegume LIKE 'Tomate';
 SELECT * FROM Fruits_Legumes_et_aromate;
 
 -- REQUETE 5 : SIGNALEMENT D'UN DÉFAUT & AFFICHAGE
-INSERT INTO Recolte VALUE (3, 1 ,
+INSERT INTO Recolte (Id_Adherent, Id_Parcelle, JJ_MM_AAAA, Id_Actions, Quantite) VALUE (3, 1 ,
                         '2024_07_20' , 7 , 0);
 
 SELECT Parcelle.Id_Parcelle , Défaut.Libellé , Recolte.JJ_MM_AAAA
@@ -248,4 +250,9 @@ FROM Recolte
 LEFT JOIN Adherent on Recolte.Id_Adherent = Adherent.Id_Adherent
 RIGHT JOIN Fruits_Legumes_et_aromate on Id_Parcelle = Fruits_Legumes_et_aromate.Id_FruitLegume
 LEFT JOIN Actions on Recolte.Id_Actions = Actions.Id_Actions
-WHERE Actions.Id_Actions = 2
+WHERE Actions.Id_Actions = 2;
+
+-- RECUPERATION DES DONNÉES POUR LES LD DU ADD
+SELECT Adherent.Nom FROM Adherent;
+SELECT Parcelle.Id_Parcelle FROM Parcelle WHERE Plante_id = 0 OR Plante_id IS NULL;
+SELECT Fruits_Legumes_et_aromate.Libelle_FruitLegume FROM Fruits_Legumes_et_aromate;
