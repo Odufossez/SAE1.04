@@ -103,7 +103,7 @@ def edit_recolte():
         LEFT JOIN Adherent on Recolte.Id_Adherent = Adherent.Id_Adherent
         RIGHT JOIN Fruits_Legumes_et_aromate on Id_Parcelle = Fruits_Legumes_et_aromate.Id_FruitLegume
         LEFT JOIN Actions on Recolte.Id_Actions = Actions.Id_Actions
-        WHERE Actions.Id_Actions = 2 AND Recolte.Id_Recolte; '''
+        WHERE Actions.Id_Actions = 2 AND Recolte.Id_Recolte = %s ; '''
     mycursor.execute(sql , (idRecolte,))
 
 
