@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    <title>Afficher les récoltes</title>
+{% endblock %}
+
+{% block body %}
+<h3>Récoltes</h3>
+<a href="/recolte/add">Ajouter une récolte</a>
+<br><br>
+
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th><th>Prénom</th><th>Nom</th><th>Numéro de parcelle</th><th>Date</th>
+            <th>Quantité</th><th>Plante récoltée</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% if recoltes | length >= 1 %}
+        {% for ligne in recoltes %}
+           <tr>
+               <td> {{ ligne.Id_Recolte }}</td>
+               <td>{{ ligne.Prenom }}</td>
+               <td> {{ ligne.Nom }}</td>
+               <td> {{ ligne.Parcelle }} </td>
+               <td> {{ ligne.Date }} </td>
+               <td>{{ ligne.Quantite }}</td>
+               <td>{{ ligne.Plante }}</td>
+
+               <td>
+                   <a class= "lien_tab" href="/recolte/edit?Id_Recolte={{ ligne.Id_Recolte }}">Éditer</a>&nbsp;
+                   <a class= "lien_tab" href="/recolte/delete?Id_Recolte={{ ligne.Id_Recolte }}" >Supprimer</a>
+               </td>
+           </tr>
+        {% endfor %}
+    {% else %}
+            <tr>
+                  <td>
+                      Pas de récolte
+                  </td>
+           </tr>
+    {% endif %}
+    </tbody>
+</table>
+{% endblock %}

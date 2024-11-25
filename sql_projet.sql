@@ -3,6 +3,7 @@ drop table if exists Recolte;
 drop table if exists Entretient;
 drop table if exists Attendre;
 drop table if exists Pousse;
+drop table if exists Pousse_dans ;
 drop table if exists Traitement;
 drop table if exists Mois;
 drop table if exists Compost;
@@ -78,6 +79,16 @@ CREATE TABLE Traitement(
     FOREIGN KEY(Id_Actions) REFERENCES Actions(Id_Actions)
 );
 
+CREATE TABLE Pousse_dans(
+    ID_Pousse_dans INT AUTO_INCREMENT NOT NULL ,
+    ID_plante INT ,
+    ID_parcelle INT ,
+
+    PRIMARY KEY (ID_Pousse_dans) ,
+    FOREIGN KEY (ID_plante) REFERENCES Fruits_Legumes_et_aromate(Id_FruitLegume),
+    FOREIGN KEY (ID_parcelle) REFERENCES Parcelle(Id_Parcelle)
+);
+
 CREATE TABLE Pousse(
     Id_FruitLégume INT AUTO_INCREMENT NOT NULL,
     Id_Mois INT,
@@ -115,6 +126,7 @@ CREATE TABLE Recolte(
     Id_Recolte INT NOT NULL AUTO_INCREMENT ,
     Id_Adherent INT,
     Id_Parcelle INT,
+    Id_plante INT ,
     JJ_MM_AAAA DATE,
     Id_Actions INT,
     Quantite DECIMAL(4,2),
@@ -122,7 +134,8 @@ CREATE TABLE Recolte(
     PRIMARY KEY(Id_Recolte),
     FOREIGN KEY(Id_Adherent) REFERENCES Adherent(Id_Adherent),
     FOREIGN KEY(Id_Parcelle) REFERENCES Parcelle(Id_Parcelle),
-    FOREIGN KEY(Id_Actions) REFERENCES Actions(Id_Actions)
+    FOREIGN KEY(Id_Actions) REFERENCES Actions(Id_Actions),
+    FOREIGN KEY(Id_plante) REFERENCES Fruits_Legumes_et_aromate(Id_FruitLegume)
 );
 
 -- AJOUT DES DONNÉES DANS LES TABLES
@@ -194,10 +207,12 @@ INSERT INTO Entretient (Id_Adherent, JJ_MM_AAAA, Id_Actions, Id_Compost, Quantit
 (1 , '2024_05_09' , 4 , 1 , 2.5),
 (2 , '2024_05_18' , 6 , 2 , 0);
 
-INSERT INTO Recolte (Id_Adherent, Id_Parcelle, JJ_MM_AAAA, Id_Actions, Quantite) VALUES
-(3 , 2 , '2024_05_07' , 8 , 0),
-(2 , 3 , '2024_05_10' , 1 , 0),
-(1 , 2 , '2024_06_28' , 2 , 3);
+INSERT INTO Recolte (Id_Adherent, Id_Parcelle, Id_plante , JJ_MM_AAAA, Id_Actions, Quantite) VALUES
+(3 , 2 , 1 ,'2024_05_07' , 8 , 0),
+(2 , 3 , 3 , '2024_05_10' , 1 , 0),
+(1 , 2 ,  4 , '2024_06_28' , 2 , 3),
+(2 , 1 , 5 , '2024_03_20' , 2 , 1.3),
+(3 , 2 , 1 , '2024_01_28' , 2 , 3);
 
 
 
@@ -248,8 +263,8 @@ SELECT Adherent.Nom as Nom , Adherent.Prenom as Prénom , Recolte.Id_Parcelle as
        Libelle_FruitLegume as Plante, Recolte.Quantite as Quantité
 FROM Recolte
 LEFT JOIN Adherent on Recolte.Id_Adherent = Adherent.Id_Adherent
-RIGHT JOIN Fruits_Legumes_et_aromate on Id_Parcelle = Fruits_Legumes_et_aromate.Id_FruitLegume
-LEFT JOIN Actions on Recolte.Id_Actions = Actions.Id_Actions
+RIGHT JOIN Fruits_Legumes_et_aromate on Recolte.Id_plante = Fruits_Legumes_et_aromate.Id_FruitLegume
+RIGHT JOIN Actions on Recolte.Id_Actions = Actions.Id_Actions
 WHERE Actions.Id_Actions = 2;
 
 -- RECUPERATION DES DONNÉES POUR LES LD DU ADD

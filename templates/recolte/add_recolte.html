@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+ <title> Ajouter une récolte </title>
+{% endblock %}
+
+{% block body %}
+<h2> Ajouter une récolte </h2>
+<form method="post" action="/enseignant/add">
+    <fieldset>
+        <legend> Créer une récolte </legend>
+
+        <label for="adherent"> Adhérents </label>
+        <select name="Id_Adherent" required>
+        <option value="">Sélectionner un adhérent</option>
+            {% for adherent in Adherent %}
+            <option value="{{ adherent.Id_Adherent }}"> {{ adherent.Nom }} {{ adherent.Prenom }}</option>
+            {% endfor %}
+        </select> <br>
+
+        <label for="parcelle"> Adhérents </label>
+        <select name="Id_Parcelle" required>
+        <option value="">Sélectionner une parcelle</option>
+            {% for parcelle in Parcelle %}
+            <option value="{{ parcelle.Id_Parcelle }}"> {{ parcelle.Id_Parcelle }}</option>
+            {% endfor %}
+        </select> <br>
+
+        <label for="plante"> Fruits, Légumes, Aromates </label>
+        <select name="Id_FruitLegume" required>
+        <option value="">Sélectionner une plante</option>
+            {% for plante in Fruits_Legumes_et_aromate %}
+            <option value="{{ plante.Id_FruitLegume }}"> {{ pante.Libelle_FruitLegume }}</option>
+            {% endfor %}
+        </select> <br>
+
+
+
+        <input type="submit" value="Creer" name="Valider">
+    </fieldset>
+</form>
+{% endblock %}
