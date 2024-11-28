@@ -1,5 +1,6 @@
+USE oscar_data;
 -- SUPPRESSION DES TABLES
-drop table if exists Fait;
+drop table if exists Recolte;
 drop table if exists Entretient;
 drop table if exists Attendre;
 drop table if exists Pousse;
@@ -47,7 +48,7 @@ CREATE TABLE Actions(
 
 CREATE TABLE Défaut(
     Id_Defaut INT AUTO_INCREMENT NOT NULL,
-    Libellé VARCHAR(20),
+    Libelle_Defaut VARCHAR(20),
     Id_Actions INT UNIQUE,
 
     PRIMARY KEY(Id_Defaut),
@@ -129,9 +130,9 @@ CREATE TABLE Recolte(
 
 -- AJOUT DES DONNÉES DANS LES TABLES
 INSERT INTO Adherent (NomPrenom, Adresse, Telephone) VALUES
-('DUSSOL Luca','Quelque part sur rien', '0612345561'),
-('HETRU Owen','La-bas','0698765432'),
-('DUFOSSEZ Oscar','Près de là','0630893144'),
+('DUSSOL Luca','3 Rue du Cadre', '0612345561'),
+('HETRU Owen','12 Avenue du Peuple','0698765432'),
+('DUFOSSEZ Oscar','6 Impasse de la Loutre','0630893144'),
 ('MARTIN Julie', '23 Rue des Lilas', '0682379156'),
 ('DUPONT Hugo', '14 Avenue des Champs', '0654893021'),
 ('LECLERC Camille', '5 Boulevard des Érables', '0778945602'),
@@ -210,13 +211,13 @@ INSERT INTO Mois (Libellé) VALUES
 ('Novembre'),
 ('Décembre');
 
-INSERT INTO Défaut(Libellé , Id_Actions) VALUES
+INSERT INTO Défaut(Libelle_Defaut , Id_Actions) VALUES
 ('Pot cassé' , 7),
 ('Tuteur cassé' , 8),
 ('Maladie' , 9),
 ('Infestation', 10);
 
-INSERT INTO Traitement(Libellé, Id_Actions) VALUES
+INSERT INTO Traitement(Libelle_traitement, Id_Actions) VALUES
 ('Engrais' , 7),
 ('Désherbant' , 7),
 ('Arrosage' , 7),
@@ -245,7 +246,7 @@ INSERT INTO Attendre (Id_traitement, Id_traitement_1, temps_attente) VALUES
 (1 , 1 , 'Un mois'),
 (2 , 1 , '24 heures'),
 (7,6,'Minimum une semaine'),
-(3,3,'Pas plus de deux fois par jour'),
+(3,3,'Pas 2x/J'),
 (4,3, '48 heures'),
 (2,3,'24h');
 
@@ -278,13 +279,13 @@ WHERE Parcelle.Id_Parcelle=2  -- "permet de choisir la parcelle"
 group by Fruits_Legumes_et_aromate.Libelle_FruitLegume;
 
 -- REQUETE 3 : VOIR LES TRAITEMENTS ET L'ACTION ASSOCIÉE
-SELECT  Traitement.Libellé, Actions.Libelle_action
+SELECT  Traitement.Libelle_traitement, Actions.Libelle_action
 FROM Traitement
 right JOIN Actions ON Traitement.Id_Actions = Actions.Id_Actions
 
 -- REQUETE 4 : MODIFIER UNE PLANTE
 where Actions.Libelle_action = 'Applique'
-ORDER BY Traitement.Libellé, Actions.Libelle_action;
+ORDER BY Traitement.Libelle_traitement, Actions.Libelle_action;
 SELECT * FROM Fruits_Legumes_et_aromate;
 
 UPDATE Fruits_Legumes_et_aromate
@@ -297,7 +298,7 @@ SELECT * FROM Fruits_Legumes_et_aromate;
 INSERT INTO Recolte (Id_Adherent, Id_Parcelle, Date_Recolte, Id_Actions, Quantite) VALUE (3, 1 ,
                         '2024_07_20' , 7 , 0);
 
-SELECT Parcelle.Id_Parcelle , Défaut.Libellé , Recolte.Date_Recolte
+SELECT Parcelle.Id_Parcelle , Défaut.Libelle_Defaut , Recolte.Date_Recolte
 FROM Parcelle
 JOIN Recolte on Parcelle.Id_Parcelle = Recolte.Id_Parcelle
 JOIN Actions on Recolte.Id_Actions = Actions.Id_Actions
