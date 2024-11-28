@@ -14,7 +14,7 @@
         <select name="Id_Adherent" required>
         <option value="">Sélectionner un adhérent</option>
             {% for adherent in Adherent %}
-            <option value="{{ adherent.Id_Adherent }}"> {{ adherent.Nom }} {{ adherent.Prenom }}</option>
+            <option value="{{ adherent.Id_Adherent }}"> {{ adherent.Nom }}</option>
             {% endfor %}
         </select> <br>
 
