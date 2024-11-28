@@ -10,11 +10,11 @@
     <fieldset>
         <legend> Créer une récolte </legend>
 
-        <label for="adherent"> Adhérents </label>
+        <label for="Id_Adherent"> Adhérents </label>
         <select name="Id_Adherent" required>
         <option value="">Sélectionner un adhérent</option>
             {% for adherent in Adherent %}
-            <option value="{{ adherent.Id_Adherent }}"> {{ adherent.Nom }}</option>
+            <option value="{{ adherent.Id_Adherent }}"> {{ adherent.NomPrenom }}</option>
             {% endfor %}
         </select> <br>
 
@@ -22,25 +22,25 @@
         <select name="Id_Parcelle" required>
         <option value="">Sélectionner une parcelle</option>
             {% for parcelle in Parcelle %}
-            <option value="{{ parcelle.Id_Parcelle }}"> {{ parcelle.Id_Parcelle }}</option>
+            <option value="{{ parcelle.Id_Parcelle }}"> {{ parcelle.Nom_Parcelle }}</option>
             {% endfor %}
         </select> <br>
 
-        <label for="Id_FruitLegume"> Fruits, Légumes, Aromates </label>
-        <select name="Id_FruitLegume" required>
-        <option value="">Sélectionner une plante</option>
-            {% for plante in Fruits_Legumes_et_aromate %}
-            <option value="{{ plante.Id_FruitLegume }}"> {{ plante.Libelle_FruitLegume }}</option>
-            {% endfor %}
-        </select> <br>
 
         <label for="date"> Date de la récolte </label>
-        <input id="date" type="date" name="JJ_MM_AAAA" size="25" value=""
+        <input id="date" type="date" name="Date_Recolte" size="25" value=""
                placeholder="" required>
 
         <label for="quantite"></label>
-        <input id="quantite" type="number" name="Quantite" min="0" max="99.9" value=""
-               placeholder="Kg" required>
+        <input id="quantite" type="number" name="Quantite" min="0.0" max="99.9" value=""
+               placeholder="Kg" required> <br>
+
+        <label for="Recolte_complete"> La parcelle est-elle vide ? </label>
+        <select name="Recolte_complete" required>
+        <option value=""> Sélectionner "oui" s'il n'y a plus de plante à récolter</option>
+            <option value="oui_recolte_complete"> Oui </option>
+            <option value="non_recolte_complete"> Non </option>
+        </select> <br>
 
         <input type="submit" value="Creer" name="Valider">
     </fieldset>

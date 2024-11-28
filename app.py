@@ -38,11 +38,12 @@ def show_accueil():
 def show_recolte():
     mycursor = get_db().cursor()
 
-    sql = ''' SELECT Recolte.Id_Recolte , Adherent.Nom as Nom , Adherent.Prenom as Prenom , Recolte.Id_Parcelle as Parcelle , 
-    Recolte.JJ_MM_AAAA as Date , Libelle_FruitLegume as Plante, Recolte.Quantite as Quantite FROM Recolte
+    sql = ''' SELECT Recolte.Id_Recolte , Adherent.NomPrenom as Nom, Parcelle.Nom_Parcelle as Parcelle , 
+    Recolte.Date_Recolte , Libelle_FruitLegume as Plante, Recolte.Quantite as Quantite FROM Recolte
     LEFT JOIN Adherent on Recolte.Id_Adherent = Adherent.Id_Adherent
     RIGHT JOIN Fruits_Legumes_et_aromate on Recolte.Id_plante = Fruits_Legumes_et_aromate.Id_FruitLegume
     RIGHT JOIN Actions on Recolte.Id_Actions = Actions.Id_Actions
+    JOIN Parcelle on Recolte.Id_Parcelle = Parcelle.Id_Parcelle
     WHERE Actions.Id_Actions = 2; '''
 
     mycursor.execute(sql)
@@ -54,19 +55,17 @@ def show_recolte():
 def add_recolte():
     mycursor = get_db().cursor()
 
-    sql = '''  SELECT Adherent.Nom FROM Adherent; '''
+    # Liste des adhérents
+    sql = '''  SELECT Adherent.Id_Adherent , Adherent.NomPrenom FROM Adherent; '''
     mycursor.execute(sql)
     Adherents = mycursor.fetchall()
 
-    sql = '''  SELECT Parcelle.Id_Parcelle FROM Parcelle WHERE Plante_id IS NOT NULL; '''
+    # Liste des parcelles qui ont des plantes actuellement
+    sql = '''  SELECT Parcelle.Id_Parcelle, Parcelle.Nom_Parcelle FROM Parcelle WHERE Plante_id IS NOT NULL; '''
     mycursor.execute(sql)
     Parcelles = mycursor.fetchall()
 
-    sql = '''  SELECT Fruits_Legumes_et_aromate.Libelle_FruitLegume FROM Fruits_Legumes_et_aromate; '''
-    mycursor.execute(sql)
-    Fruits_Legumes_et_aromate = mycursor.fetchall()
-
-    return render_template('recolte/add_recolte.html' , Adherent = Adherents , Parcelle = Parcelles , Fruits_Legumes_et_aromate = Fruits_Legumes_et_aromate)
+    return render_template('recolte/add_recolte.html' , Adherent = Adherents , Parcelle = Parcelles)
 
 @app.route('/recolte/add' , methods=['POST'])
 def valid_add_recolte():
@@ -74,20 +73,43 @@ def valid_add_recolte():
 
     idAdherent = request.form.get('Id_Adherent', '')
     Id_Parcelle = request.form.get('Id_Parcelle', '')
-    Date = request.form.get('JJ_MM_AAAA', '')
-    Id_FruitLegume = request.form.get('Id_FruitLegume', '')
+    Date = request.form.get('Date_Recolte', '')
     Quantite = request.form.get('Quantite', '')
+    Recolte_complete = request.form.get('Recolte_complete', '') #indicateur de si la parcelle est vide ou non
 
-    tuple_insert = (Id_Parcelle)
-    sql = '''  UPDATE Parcelle SET Plante_id = 0 WHERE Id_Parcelle = %s;'''
-    mycursor.execute(sql, tuple_insert)
+    # si la récolte vide la parcelle alors on met à jour la table parcelle
+    if (Recolte_complete == "oui_recolte_complete"):
 
-    tuple_insert = (idAdherent , Id_Parcelle , Date , Quantite)
-    sql = ''' INSERT INTO Recolte (Id_Adherent , Id_Parcelle , Date , Id_Action , Quantite) VALUES (%s, %s, %s, 2 ,%s);'''
+        mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
+        mycursor.execute("ALTER TABLE Parcelle DISABLE KEYS;",)
+
+        tuple_update = (Id_Parcelle)
+        sql = '''  UPDATE Parcelle SET Plante_id = NULL WHERE Id_Parcelle = %s; '''
+        mycursor.execute(sql, tuple_update)
+        get_db().commit()
+        mycursor.execute("ALTER TABLE Parcelle ENABLE KEYS;",)
+        mycursor.execute("SET FOREIGN_KEY_CHECKS=1;",)
+
+    #Récupération de la plante sur la parcelle sélectionnée
+    tuple_plante = (Id_Parcelle)
+    sql = ''' SELECT Fruits_Legumes_et_aromate.Libelle_FruitLegume FROM Fruits_Legumes_et_aromate
+    JOIN Parcelle on Parcelle.Plante_id = Fruits_Legumes_et_aromate.Id_FruitLegume
+    WHERE Parcelle.Id_Parcelle = %s; '''
+    plante = mycursor.execute(sql, tuple_plante)
+
+
+    tuple_plante_id = (plante)
+    sql = ''' SELECT Id_FruitLegume FROM Fruits_Legumes_et_aromate WHERE Libelle_FruitLegume LIKE '%s'; '''
+    id_plante = mycursor.execute(sql, tuple_plante_id)
+
+    tuple_insert = (idAdherent , Id_Parcelle , id_plante , Date , Quantite)
+    sql = ''' INSERT INTO Recolte (Id_Adherent , Id_Parcelle , Id_Plante , Date_Recolte , Id_Actions , Quantite) 
+    VALUES (%s, %s, %s, %s, 2 ,%s);'''
     mycursor.execute(sql, tuple_insert)
+    get_db().commit()
 
     message = (u'Récolte ajoutée : Adhérent : ' + idAdherent + ' --Parcelle : ' + Id_Parcelle +
-               ' --Plante : ' + Id_FruitLegume + ' --Date : ' + Date + ' --Quantite : ' + Quantite)
+               ' --Plante : ' + plante + ' --Date : ' + Date + ' --Quantite : ' + Quantite)
     print(message)
     flash(message, 'alert-success')
     return redirect(url_for('show_recolte'))
@@ -97,8 +119,8 @@ def edit_recolte():
     mycursor = get_db().cursor()
 
     idRecolte = request.args.get('Id_Recolte', '')
-    sql = ''' SELECT Adherent.Nom as Nom , Adherent.Prenom as Prénom , Recolte.Id_Parcelle as Parcelle , 
-        Recolte.JJ_MM_AAAA as Date ,
+    sql = ''' SELECT Adherent.NomPrenom as Nom , Recolte.Id_Parcelle as Parcelle , 
+        Recolte.Date_Recolte as Date ,
         Libelle_FruitLegume as Plante, Recolte.Quantite as Quantité
         FROM Recolte
         LEFT JOIN Adherent on Recolte.Id_Adherent = Adherent.Id_Adherent
@@ -109,11 +131,11 @@ def edit_recolte():
     mycursor.execute(sql , (idRecolte,))
     Recolte = mycursor.fetchone()
 
-    sql = '''  SELECT Adherent.Nom FROM Adherent; '''
+    sql = '''  SELECT Adherent.NomPrenom FROM Adherent; '''
     mycursor.execute(sql)
     Adherents = mycursor.fetchall()
 
-    sql = '''  SELECT Parcelle.Id_Parcelle FROM Parcelle WHERE Plante_id = 0 OR Plante_id IS NULL; '''
+    sql = '''  SELECT Parcelle.Id_Parcelle FROM Parcelle WHERE Plante_id IS NOT NULL; '''
     mycursor.execute(sql)
     Parcelles = mycursor.fetchall()
 

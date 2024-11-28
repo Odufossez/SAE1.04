@@ -318,3 +318,10 @@ WHERE Actions.Id_Actions = 2;
 SELECT Adherent.NomPrenom FROM Adherent;
 SELECT Parcelle.Id_Parcelle FROM Parcelle WHERE Plante_id IS NOT NULL;
 SELECT Fruits_Legumes_et_aromate.Libelle_FruitLegume FROM Fruits_Legumes_et_aromate;
+
+-- RÉCUPÉRATION DU NOM DE LA PLANTE POUR LA RÉOLTE
+SELECT Fruits_Legumes_et_aromate.Libelle_FruitLegume FROM Fruits_Legumes_et_aromate
+JOIN Parcelle on Parcelle.Plante_id = Fruits_Legumes_et_aromate.Id_FruitLegume
+WHERE Parcelle.Id_Parcelle = 5;
+
+ALTER TABLE Parcelle DISABLE KEYS;

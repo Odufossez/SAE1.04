@@ -12,7 +12,7 @@
 <table class="table">
     <thead class="thead-dark">
         <tr>
-            <th>ID</th><th>Prénom</th><th>Nom</th><th>Numéro de parcelle</th><th>Date</th>
+            <th>ID</th><th>Nom</th><th>Numéro de parcelle</th><th>Date</th>
             <th>Quantité</th><th>Plante récoltée</th>
         </tr>
     </thead>
@@ -21,10 +21,9 @@
         {% for ligne in recoltes %}
            <tr>
                <td> {{ ligne.Id_Recolte }}</td>
-               <td>{{ ligne.Prenom }}</td>
                <td> {{ ligne.Nom }}</td>
                <td> {{ ligne.Parcelle }} </td>
-               <td> {{ ligne.Date }} </td>
+               <td> {{ ligne.Date_Recolte }} </td>
                <td>{{ ligne.Quantite }}</td>
                <td>{{ ligne.Plante }}</td>
 

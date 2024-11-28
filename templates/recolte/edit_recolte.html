@@ -1,0 +1,49 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+ <title> Modifier une récolte </title>
+{% endblock %}
+
+{% block body %}
+<h2> Modifier une récolte </h2>
+<form method="post" action="/recolte/edit">
+    <fieldset>
+        <legend> Modifier une récolte </legend>
+
+        <label for="adherent"> Adhérents </label>
+        <select name="Id_Adherent" required>
+        {% for adherent in Adherent %}
+            <option value="{{ adherent.Id_Adherent"
+            {% if recolte.Id_Adherent is defined and adherent.Id_Adherent ==
+            recolte.Id_Adherent %}selected{%endif%}> {{ adherent.NomPrenom }} </option>
+        {% endfor %}
+        </select> <br>
+
+        <label for="Id_Parcelle"> Parcelle </label>
+        <select name="Id_Parcelle" required>
+        <option value="">Sélectionner une parcelle</option>
+            {% for parcelle in Parcelle %}
+            <option value="{{ parcelle.Id_Parcelle }}"> {{ parcelle.Nom_Parcelle }}</option>
+            {% endfor %}
+        </select> <br>
+
+
+        <label for="date"> Date de la récolte </label>
+        <input id="date" type="date" name="Date_Recolte" size="25" value=""
+               placeholder="" required>
+
+        <label for="quantite"></label>
+        <input id="quantite" type="number" name="Quantite" min="0.0" max="99.9" value=""
+               placeholder="Kg" required> <br>
+
+        <label for="Recolte_complete"> La parcelle est-elle vide ? </label>
+        <select name="Recolte_complete" required>
+        <option value=""> Sélectionner "oui" s'il n'y a plus de plante à récolter</option>
+            <option value="oui_recolte_complete"> Oui </option>
+            <option value="non_recolte_complete"> Non </option>
+        </select> <br>
+
+        <input type="submit" value="Creer" name="Valider">
+    </fieldset>
+</form>
+{% endblock %}
