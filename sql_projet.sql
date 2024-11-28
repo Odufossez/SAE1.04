@@ -16,8 +16,7 @@ drop table if exists Adherent;
 -- CREATION DES TABLES
 CREATE TABLE Adherent(
    Id_Adherent INT AUTO_INCREMENT NOT NULL,
-   Nom VARCHAR(50),
-   Prenom VARCHAR(50),
+   NomPrenom VARCHAR(50),
    Adresse VARCHAR(50),
    Telephone VARCHAR(10),
    PRIMARY KEY(Id_Adherent)
@@ -82,11 +81,11 @@ CREATE TABLE Traitement(
 
 CREATE TABLE Pousse(
     Id_FruitLégume INT AUTO_INCREMENT NOT NULL,
-    Id_Mois INT,
+    Id_mois_a_planter INT,
 
-    PRIMARY KEY(Id_FruitLégume, Id_Mois),
+    PRIMARY KEY(Id_FruitLégume, Id_mois_a_planter),
     FOREIGN KEY(Id_FruitLégume) REFERENCES Fruits_Legumes_et_aromate(Id_FruitLegume),
-    FOREIGN KEY(Id_Mois) REFERENCES Mois(Id_Mois)
+    FOREIGN KEY(Id_mois_a_planter) REFERENCES Mois(Id_Mois)
 );
 
 CREATE TABLE Attendre(
@@ -130,10 +129,20 @@ CREATE TABLE Recolte(
 );
 
 -- AJOUT DES DONNÉES DANS LES TABLES
-INSERT INTO Adherent (Nom, Prenom, Adresse, Telephone) VALUES
-('DUSSOL','Luca','Quelque part sur rien', '0612345561'),
-('HETRU','Owen','La-bas','0698765432'),
-('DUFOSSEZ','Oscar','Près de là','0630893144');
+INSERT INTO Adherent (NomPrenom, Adresse, Telephone) VALUES
+('DUSSOL Luca','Quelque part sur rien', '0612345561'),
+('HETRU Owen','La-bas','0698765432'),
+('DUFOSSEZ Oscar','Près de là','0630893144'),
+('MARTIN Julie', '23 Rue des Lilas', '0682379156'),
+('DUPONT Hugo', '14 Avenue des Champs', '0654893021'),
+('LECLERC Camille', '5 Boulevard des Érables', '0778945602'),
+('GIRARD Louis', '17 Impasse des Fleurs', '0612345678'),
+('BERTRAND Chloé', '8 Allée des Peupliers', '0698751234'),
+('LAMBERT Lucas', '10 Rue de la Liberté', '0645128793'),
+('ROUSSEAU Emma', '3 Chemin des Sources', '0712348956'),
+('FONTAINE Nathan', '12 Place de la République', '0678953412'),
+('MOREAU Sarah', '19 Rue du Soleil', '0632789456'),
+('BLANC Thomas', '25 Avenue de la Paix', '0623456789');
 
 INSERT INTO Fruits_Legumes_et_aromate (Libelle_FruitLegume) VALUES
 ('Pastèque'),
@@ -148,7 +157,7 @@ INSERT INTO Fruits_Legumes_et_aromate (Libelle_FruitLegume) VALUES
 ('Betterave'),
 ('Poivron'),
 ('Epinard'),
-('Salade'),
+('Salade d\'hiver'),
 ('Haricots verts');
 
 INSERT INTO Parcelle (Parcelle.Nom_Parcelle, Parcelle.Surface, Parcelle.Plante_id) VALUES
@@ -216,14 +225,29 @@ INSERT INTO Traitement(Libellé, Id_Actions) VALUES
 ('Anti-fongique',7),
 ('Anti-vermine',7);
 
-INSERT INTO Pousse (Id_FruitLégume, Id_Mois) VALUES
+INSERT INTO Pousse (Id_FruitLégume, Id_mois_a_planter) VALUES
 (1 , 3),
 (2,5),
-(4 , 5);
+(3, 4),
+(4 , 4),
+(5,5),
+(6, 5),
+(7,4),
+(8,4),
+(9,3),
+(10, 3),
+(11,2),
+(12,12),
+(13,8),
+(14,4);
 
 INSERT INTO Attendre (Id_traitement, Id_traitement_1, temps_attente) VALUES
 (1 , 1 , 'Un mois'),
-(2 , 1 , '24 heures');
+(2 , 1 , '24 heures'),
+(7,6,'Minimum une semaine'),
+(3,3,'Pas plus de deux fois par jour'),
+(4,3, '48 heures'),
+(2,3,'24h');
 
 INSERT INTO Entretient (Id_Adherent, Date_Entretient, Id_Actions, Id_Compost, Quantite)VALUES
 (1 , '2024_05_09' , 4 , 1 , 2.5),
@@ -240,7 +264,7 @@ INSERT INTO Recolte (Id_Adherent, Id_Parcelle, Id_plante , Date_Recolte, Id_Acti
 
 -- REQUETES ----------------
 -- REQUETE 1 : VOIR LES ACTIONS SUR LA PARCELLE 2
-SELECT Adherent.Prenom , Adherent.Nom , Actions.Libelle_action
+SELECT Adherent.NomPrenom , Actions.Libelle_action
 FROM Adherent
 JOIN Recolte on Adherent.Id_Adherent = Recolte.Id_Adherent
 LEFT JOIN Actions on  Actions.Id_Actions = Recolte.Id_Actions
@@ -281,7 +305,7 @@ JOIN Défaut on Actions.Id_Actions = Défaut.Id_Actions;
 
 
 -- AFFICHAGE DES RECOLTES AVEC NOM ADHERENT, ID PARCELLE , NOM ACTION , DATE RECOLTE , QTITÉ RAMASSÉE
-SELECT Adherent.Nom as Nom , Adherent.Prenom as Prénom , Recolte.Id_Parcelle as Parcelle , Recolte.Date_Recolte as Date ,
+SELECT Adherent.NomPrenom as Nom, Recolte.Id_Parcelle as Parcelle , Recolte.Date_Recolte as Date ,
        Libelle_FruitLegume as Plante, Recolte.Quantite as Quantité
 FROM Recolte
 LEFT JOIN Adherent on Recolte.Id_Adherent = Adherent.Id_Adherent
@@ -290,6 +314,6 @@ RIGHT JOIN Actions on Recolte.Id_Actions = Actions.Id_Actions
 WHERE Actions.Id_Actions = 2;
 
 -- RECUPERATION DES DONNÉES POUR LES LD DU ADD
-SELECT Adherent.Nom FROM Adherent;
+SELECT Adherent.NomPrenom FROM Adherent;
 SELECT Parcelle.Id_Parcelle FROM Parcelle WHERE Plante_id IS NOT NULL;
 SELECT Fruits_Legumes_et_aromate.Libelle_FruitLegume FROM Fruits_Legumes_et_aromate;
