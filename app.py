@@ -58,7 +58,7 @@ def add_recolte():
     mycursor.execute(sql)
     Adherents = mycursor.fetchall()
 
-    sql = '''  SELECT Parcelle.Id_Parcelle FROM Parcelle WHERE Plante_id = 0 OR Plante_id IS NULL; '''
+    sql = '''  SELECT Parcelle.Id_Parcelle FROM Parcelle WHERE Plante_id IS NOT NULL; '''
     mycursor.execute(sql)
     Parcelles = mycursor.fetchall()
 
@@ -78,8 +78,8 @@ def valid_add_recolte():
     Id_FruitLegume = request.form.get('Id_FruitLegume', '')
     Quantite = request.form.get('Quantite', '')
 
-    tuple_insert = (Id_FruitLegume , Id_Parcelle)
-    sql = '''  INSERT INTO Parcelle (Plante_id) VALUE (%s) WHERE Id_Parcelle = %s;'''
+    tuple_insert = (Id_Parcelle)
+    sql = '''  UPDATE Parcelle SET Plante_id = 0 WHERE Id_Parcelle = %s;'''
     mycursor.execute(sql, tuple_insert)
 
     tuple_insert = (idAdherent , Id_Parcelle , Date , Quantite)

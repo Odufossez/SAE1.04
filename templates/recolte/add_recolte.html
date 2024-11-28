@@ -6,7 +6,7 @@
 
 {% block body %}
 <h2> Ajouter une récolte </h2>
-<form method="post" action="/enseignant/add">
+<form method="post" action="/recolte/add">
     <fieldset>
         <legend> Créer une récolte </legend>
 
@@ -18,7 +18,7 @@
             {% endfor %}
         </select> <br>
 
-        <label for="parcelle"> Adhérents </label>
+        <label for="Id_Parcelle"> Parcelle </label>
         <select name="Id_Parcelle" required>
         <option value="">Sélectionner une parcelle</option>
             {% for parcelle in Parcelle %}
@@ -26,15 +26,21 @@
             {% endfor %}
         </select> <br>
 
-        <label for="plante"> Fruits, Légumes, Aromates </label>
+        <label for="Id_FruitLegume"> Fruits, Légumes, Aromates </label>
         <select name="Id_FruitLegume" required>
         <option value="">Sélectionner une plante</option>
             {% for plante in Fruits_Legumes_et_aromate %}
-            <option value="{{ plante.Id_FruitLegume }}"> {{ pante.Libelle_FruitLegume }}</option>
+            <option value="{{ plante.Id_FruitLegume }}"> {{ plante.Libelle_FruitLegume }}</option>
             {% endfor %}
         </select> <br>
 
+        <label for="date"> Date de la récolte </label>
+        <input id="date" type="date" name="JJ_MM_AAAA" size="25" value=""
+               placeholder="" required>
 
+        <label for="quantite"></label>
+        <input id="quantite" type="number" name="Quantite" min="0" max="99.9" value=""
+               placeholder="Kg" required>
 
         <input type="submit" value="Creer" name="Valider">
     </fieldset>

@@ -32,6 +32,7 @@ CREATE TABLE Fruits_Legumes_et_aromate(
 
 CREATE TABLE Parcelle(
     Id_Parcelle INT AUTO_INCREMENT NOT NULL,
+    Nom_Parcelle VARCHAR(4),
     Surface NUMERIC(4,2),
     Plante_id INT,
 
@@ -79,16 +80,6 @@ CREATE TABLE Traitement(
     FOREIGN KEY(Id_Actions) REFERENCES Actions(Id_Actions)
 );
 
-CREATE TABLE Pousse_dans(
-    ID_Pousse_dans INT AUTO_INCREMENT NOT NULL ,
-    ID_plante INT ,
-    ID_parcelle INT ,
-
-    PRIMARY KEY (ID_Pousse_dans) ,
-    FOREIGN KEY (ID_plante) REFERENCES Fruits_Legumes_et_aromate(Id_FruitLegume),
-    FOREIGN KEY (ID_parcelle) REFERENCES Parcelle(Id_Parcelle)
-);
-
 CREATE TABLE Pousse(
     Id_FruitLégume INT AUTO_INCREMENT NOT NULL,
     Id_Mois INT,
@@ -111,7 +102,7 @@ CREATE TABLE Attendre(
 CREATE TABLE Entretient(
     Id_Entretient INT NOT NULL AUTO_INCREMENT ,
     Id_Adherent INT,
-    JJ_MM_AAAA DATE,
+    Date_Entretient DATE,
     Id_Actions INT,
     Id_Compost INT,
     Quantite DECIMAL(4,2),
@@ -127,7 +118,7 @@ CREATE TABLE Recolte(
     Id_Adherent INT,
     Id_Parcelle INT,
     Id_plante INT ,
-    JJ_MM_AAAA DATE,
+    Date_Recolte DATE,
     Id_Actions INT,
     Quantite DECIMAL(4,2),
 
@@ -144,17 +135,39 @@ INSERT INTO Adherent (Nom, Prenom, Adresse, Telephone) VALUES
 ('HETRU','Owen','La-bas','0698765432'),
 ('DUFOSSEZ','Oscar','Près de là','0630893144');
 
-INSERT INTO Parcelle (Surface) VALUES
-(4),
-(3),
-(2.5);
-
 INSERT INTO Fruits_Legumes_et_aromate (Libelle_FruitLegume) VALUES
 ('Pastèque'),
 ('Persil'),
 ('Piment d espelette'),
 ('Tomate'),
-('Pomme de terre');
+('Pomme de terre'),
+('Courgette'),
+('Potiron'),
+('Potimaron'),
+('Courge'),
+('Betterave'),
+('Poivron'),
+('Epinard'),
+('Salade'),
+('Haricots verts');
+
+INSERT INTO Parcelle (Parcelle.Nom_Parcelle, Parcelle.Surface, Parcelle.Plante_id) VALUES
+('A1', 2.5 , 5),
+('A2' , 3 , 6),
+('A3' , 2 , 7),
+('A4' , 4 , NULL),
+('B1' , 1 , 2),
+('B2' , 2 , 3),
+('B3' , 3 , NULL),
+('B4' , 3.4 , NULL),
+('C1' , 5 , NULL),
+('C2' , 3 , NULL),
+('C3' , 3.6 , NULL),
+('C4' , 2.1 , NULL),
+('D1' , 7 , NULL),
+('D2' , 3.9 , NULL),
+('D3' , 4.5 , NULL),
+('D4' , 3 , NULL);
 
 INSERT INTO Actions (Libelle_action) VALUES
 ('Planter'),
@@ -165,11 +178,14 @@ INSERT INTO Actions (Libelle_action) VALUES
 ('Applique'),
 ('Pot cassé'),
 ('Tuteur cassé'),
-('Maladie');
+('Maladie'),
+('Infestation');
 
 INSERT INTO Compost (Taille, Localisation) VALUES
 (12,'B4'),
-(10,'D4');
+(10,'D4'),
+(15, 'A2'),
+(6, 'D1');
 
 INSERT INTO Mois (Libellé) VALUES
 ('Janvier'),
@@ -188,26 +204,32 @@ INSERT INTO Mois (Libellé) VALUES
 INSERT INTO Défaut(Libellé , Id_Actions) VALUES
 ('Pot cassé' , 7),
 ('Tuteur cassé' , 8),
-('Maladie' , 9);
+('Maladie' , 9),
+('Infestation', 10);
 
 INSERT INTO Traitement(Libellé, Id_Actions) VALUES
 ('Engrais' , 7),
 ('Désherbant' , 7),
-('Arrosage' , 7);
+('Arrosage' , 7),
+('Rempotage' , 7),
+('Pose de tuteurs', 7),
+('Anti-fongique',7),
+('Anti-vermine',7);
 
 INSERT INTO Pousse (Id_FruitLégume, Id_Mois) VALUES
-(1 , 6),
+(1 , 3),
+(2,5),
 (4 , 5);
 
 INSERT INTO Attendre (Id_traitement, Id_traitement_1, temps_attente) VALUES
 (1 , 1 , 'Un mois'),
 (2 , 1 , '24 heures');
 
-INSERT INTO Entretient (Id_Adherent, JJ_MM_AAAA, Id_Actions, Id_Compost, Quantite)VALUES
+INSERT INTO Entretient (Id_Adherent, Date_Entretient, Id_Actions, Id_Compost, Quantite)VALUES
 (1 , '2024_05_09' , 4 , 1 , 2.5),
 (2 , '2024_05_18' , 6 , 2 , 0);
 
-INSERT INTO Recolte (Id_Adherent, Id_Parcelle, Id_plante , JJ_MM_AAAA, Id_Actions, Quantite) VALUES
+INSERT INTO Recolte (Id_Adherent, Id_Parcelle, Id_plante , Date_Recolte, Id_Actions, Quantite) VALUES
 (3 , 2 , 1 ,'2024_05_07' , 8 , 0),
 (2 , 3 , 3 , '2024_05_10' , 1 , 0),
 (1 , 2 ,  4 , '2024_06_28' , 2 , 3),
@@ -248,10 +270,10 @@ WHERE Libelle_FruitLegume LIKE 'Tomate';
 SELECT * FROM Fruits_Legumes_et_aromate;
 
 -- REQUETE 5 : SIGNALEMENT D'UN DÉFAUT & AFFICHAGE
-INSERT INTO Recolte (Id_Adherent, Id_Parcelle, JJ_MM_AAAA, Id_Actions, Quantite) VALUE (3, 1 ,
+INSERT INTO Recolte (Id_Adherent, Id_Parcelle, Date_Recolte, Id_Actions, Quantite) VALUE (3, 1 ,
                         '2024_07_20' , 7 , 0);
 
-SELECT Parcelle.Id_Parcelle , Défaut.Libellé , Recolte.JJ_MM_AAAA
+SELECT Parcelle.Id_Parcelle , Défaut.Libellé , Recolte.Date_Recolte
 FROM Parcelle
 JOIN Recolte on Parcelle.Id_Parcelle = Recolte.Id_Parcelle
 JOIN Actions on Recolte.Id_Actions = Actions.Id_Actions
@@ -259,7 +281,7 @@ JOIN Défaut on Actions.Id_Actions = Défaut.Id_Actions;
 
 
 -- AFFICHAGE DES RECOLTES AVEC NOM ADHERENT, ID PARCELLE , NOM ACTION , DATE RECOLTE , QTITÉ RAMASSÉE
-SELECT Adherent.Nom as Nom , Adherent.Prenom as Prénom , Recolte.Id_Parcelle as Parcelle , Recolte.JJ_MM_AAAA as Date ,
+SELECT Adherent.Nom as Nom , Adherent.Prenom as Prénom , Recolte.Id_Parcelle as Parcelle , Recolte.Date_Recolte as Date ,
        Libelle_FruitLegume as Plante, Recolte.Quantite as Quantité
 FROM Recolte
 LEFT JOIN Adherent on Recolte.Id_Adherent = Adherent.Id_Adherent
@@ -269,5 +291,5 @@ WHERE Actions.Id_Actions = 2;
 
 -- RECUPERATION DES DONNÉES POUR LES LD DU ADD
 SELECT Adherent.Nom FROM Adherent;
-SELECT Parcelle.Id_Parcelle FROM Parcelle WHERE Plante_id = 0 OR Plante_id IS NULL;
+SELECT Parcelle.Id_Parcelle FROM Parcelle WHERE Plante_id IS NOT NULL;
 SELECT Fruits_Legumes_et_aromate.Libelle_FruitLegume FROM Fruits_Legumes_et_aromate;
