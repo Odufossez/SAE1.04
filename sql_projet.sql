@@ -1,9 +1,8 @@
 -- SUPPRESSION DES TABLES
-drop table if exists Recolte;
+drop table if exists Fait;
 drop table if exists Entretient;
 drop table if exists Attendre;
 drop table if exists Pousse;
-drop table if exists Pousse_dans ;
 drop table if exists Traitement;
 drop table if exists Mois;
 drop table if exists Compost;
@@ -72,7 +71,7 @@ CREATE TABLE Mois(
 
 CREATE TABLE Traitement(
     Id_traitement INT AUTO_INCREMENT NOT NULL ,
-    Libellé VARCHAR(20),
+    Libelle_traitement VARCHAR(20),
     Id_Actions INT,
 
     PRIMARY KEY(Id_traitement),
@@ -183,6 +182,7 @@ INSERT INTO Actions (Libelle_action) VALUES
 ('Récolter'),
 ('Vider'),
 ('Ajouter'),
+('Signale'),
 ('Nettoyer'),
 ('Applique'),
 ('Pot cassé'),
