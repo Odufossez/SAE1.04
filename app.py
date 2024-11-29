@@ -204,4 +204,58 @@ def delete_recolte():
     flash(u'Une récolte a été supprimée : ' + id_delete , 'alerte-warning')
     return redirect('/recolte/show')
 
-#--------------------------------------------------------
+
+#----------Parcelle----------------------------------------------
+
+@app.route('/parcelle/show' , methods=['GET'])
+def show_parcelle():
+    mycursor = get_db().cursor()
+
+    sql = ''' SELECT * 
+            From Parcelle'''
+
+    mycursor.execute(sql)
+    recoltes = mycursor.fetchall()
+
+    return render_template('recolte/show_recolte.html' , recoltes = recoltes)
+
+@app.route('/parcelle/add' , methods=['GET'])
+def add_parcelle():
+    mycursor = get_db().cursor()
+
+    # Liste des adhérents
+    sql = '''  SELECT Parcelle.Id_Parcelle , Parcelle.Nom_Parcelle FROM Parcelle; '''
+    mycursor.execute(sql)
+    Parcelle = mycursor.fetchall()
+
+    # donne la plante plantes actuellement dans la parcelle
+    sql = '''  SELECT Parcelle.Nom_Parcelle, Fruits_Legumes_et_aromate.Libelle_FruitLegume
+            FROM Parcelle
+            Join Fruits_Legumes_et_aromate
+                on Fruits_Legumes_et_aromate.Id_FruitLegume = Parcelle.Plante_id; '''
+    mycursor.execute(sql)
+    Parcelles = mycursor.fetchall()
+
+    return render_template('parcelle/add_parcelle.html' , Parcelle = Parcelles)
+
+@app.route('/parcelle/add' , methods=['POST'])
+def valid_add_parcelle():
+    mycursor = get_db().cursor()
+
+    Id_Parcelle = request.form.get('Id_Parcelle', '')
+    Nom_Parcelle = request.form.get('Nom_Parcelle', '')
+    Surface = request.form.get('Surface', '')
+    Plante_id = request.form.get('Plante_id', '') #indicateur de si la parcelle est vide ou non
+
+
+    #Insertion dans la table récolte
+    tuple_insert = (Id_Parcelle , Nom_Parcelle , Surface , Plante_id )
+    sql = ''' INSERT INTO Recolte (Id_Parcelle, Nom_Parcelle, Surface , Plante_id) VALUES 
+    (%s , %s , %s , %s);'''
+    mycursor.execute(sql, tuple_insert)
+    get_db().commit()
+
+    message = (u'Parcellle Id : ' + Id_Parcelle + ' --Nom parcelle : ' + Nom_Parcelle + ' --Surface : ' + Surface + ' --Plante_id : ' + Plante_id)
+    print(message)
+    flash(message, 'alert-success')
+    return redirect(url_for('show_parcelle'))

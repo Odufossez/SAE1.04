@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+ <title> Ajouter une parcelle </title>
+{% endblock %}
+
+{% block body %}
+<h2> Ajouter une parcelle </h2>
+<form method="post" action="/parcelle/add">
+    <fieldset>
+        <legend> Créer une parcelle </legend>
+
+        <label for="Id_Parcelle"> Parcelle </label>
+        <select name="Id_Parcelle" required>
+        <option value="">Sélectionner une parcelle</option>
+            {% for parcelle in Parcelle %}
+            <option value="{{ Parcelle.Id_Parcelle }}"> {{ Parcelle.Nom_Parcelle }}</option>
+            {% endfor %}
+        </select> <br>
+
+
+        <label for="Nom_Parcelle"> Nom </label>
+        <input id="Nom_Parcelle" type="VARCHAR(4)" name="Nom de parcelle" size="25" value=""
+               placeholder="" required>
+
+        <label for="Surface"> Date de la récolte </label>
+        <input id="Surface" type="NUMERIC(4,2)" name="Surface" size="25" value=""
+               placeholder="" required>
+
+        <label for="Plante_id"></label>
+        <input id="Plante_id" type="INT" name="Plante_id" min="0.0" max="99.9" value="" required> <br>
+
+        <input type="submit" value="Creer" name="Valider">
+    </fieldset>
+</form>
+{% endblock %}
