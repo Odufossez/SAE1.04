@@ -12,9 +12,9 @@
 
         <label for="Adherents"> Adhérents </label>
         <select name="Id_Adherent">
-        {% for adherent in adherents %}
+        {% for adherent in Adherents %}
         <option value="{{ adherent.Id_Adherent }}"
-            {% if recolte.Id_Adherent is defined and adherent.Id_Adherent == recolte.Id_Adherent %} selected {% endif %}
+            {% if Recolte.Id_Adherent is defined and adherent.Id_Adherent == Recolte.Id_Adherent %} selected {% endif %}
         > {{ adherent.NomPrenom }} </option>
         {% endfor %}
         </select> <br>

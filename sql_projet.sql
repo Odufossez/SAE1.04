@@ -340,3 +340,7 @@ FROM Recolte
         RIGHT JOIN Fruits_Legumes_et_aromate on Recolte.Id_plante = Fruits_Legumes_et_aromate.Id_FruitLegume
         JOIN Parcelle on Recolte.Id_Parcelle = Parcelle.Id_Parcelle
 WHERE Recolte.Id_Recolte = 3 ;
+
+-- RÉCUPÉRATION TABLEAU PARCELLES
+SELECT Fruits_Legumes_et_aromate.Libelle_FruitLegume , Parcelle.Nom_Parcelle , Parcelle.Id_Parcelle FROM Parcelle
+JOIN Fruits_Legumes_et_aromate ON Parcelle.Plante_id = Fruits_Legumes_et_aromate.Id_FruitLegume;

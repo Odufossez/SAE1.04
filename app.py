@@ -119,13 +119,13 @@ def edit_recolte():
 
     #Récupération de la ligne dans la DB
     sql = ''' SELECT Adherent.NomPrenom as Nom , Adherent.Id_Adherent, Recolte.Id_Parcelle as Parcelle ,
-       Recolte.Date_Recolte , Parcelle.Nom_Parcelle,
-       Libelle_FruitLegume as Plante, Recolte.Quantite
-FROM Recolte
+        Recolte.Date_Recolte , Parcelle.Nom_Parcelle,
+        Libelle_FruitLegume as Plante, Recolte.Quantite
+        FROM Recolte
         LEFT JOIN Adherent on Recolte.Id_Adherent = Adherent.Id_Adherent
-        RIGHT JOIN fruits_legumes_et_aromate on Recolte.Id_plante = fruits_legumes_et_aromate.Id_FruitLegume
+        RIGHT JOIN Fruits_Legumes_et_aromate on Recolte.Id_plante = Fruits_Legumes_et_aromate.Id_FruitLegume
         JOIN Parcelle on Recolte.Id_Parcelle = Parcelle.Id_Parcelle
-WHERE Recolte.Id_Recolte = %s ;'''
+        WHERE Recolte.Id_Recolte = %s ;'''
 
     mycursor.execute(sql , (idRecolte,))
     recolte = mycursor.fetchone()
@@ -139,7 +139,7 @@ WHERE Recolte.Id_Recolte = %s ;'''
     mycursor.execute(sql)
     parcelles = mycursor.fetchall()
 
-    sql = '''  SELECT Id_FruitLegume , fruits_legumes_et_aromate.Libelle_FruitLegume FROM fruits_legumes_et_aromate; '''
+    sql = '''  SELECT Id_FruitLegume , Fruits_Legumes_et_aromate.Libelle_FruitLegume FROM Fruits_Legumes_et_aromate; '''
     mycursor.execute(sql)
     fruits_legumes_et_aromate = mycursor.fetchall()
 
