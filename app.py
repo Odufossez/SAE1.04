@@ -123,28 +123,28 @@ def edit_recolte():
        Libelle_FruitLegume as Plante, Recolte.Quantite
 FROM Recolte
         LEFT JOIN Adherent on Recolte.Id_Adherent = Adherent.Id_Adherent
-        RIGHT JOIN Fruits_Legumes_et_aromate on Recolte.Id_plante = Fruits_Legumes_et_aromate.Id_FruitLegume
+        RIGHT JOIN fruits_legumes_et_aromate on Recolte.Id_plante = fruits_legumes_et_aromate.Id_FruitLegume
         JOIN Parcelle on Recolte.Id_Parcelle = Parcelle.Id_Parcelle
 WHERE Recolte.Id_Recolte = %s ;'''
 
     mycursor.execute(sql , (idRecolte,))
-    Recolte = mycursor.fetchone()
+    recolte = mycursor.fetchone()
 
     # RECUPERATION DES LISTES DÉROULANTES
     sql = '''  SELECT Adherent.NomPrenom FROM Adherent; '''
     mycursor.execute(sql)
-    Adherents = mycursor.fetchall()
+    adherents = mycursor.fetchall()
 
     sql = '''  SELECT Parcelle.Id_Parcelle , Parcelle.Nom_Parcelle FROM Parcelle; '''
     mycursor.execute(sql)
-    Parcelles = mycursor.fetchall()
+    parcelles = mycursor.fetchall()
 
-    sql = '''  SELECT Id_FruitLegume , Fruits_Legumes_et_aromate.Libelle_FruitLegume FROM Fruits_Legumes_et_aromate; '''
+    sql = '''  SELECT Id_FruitLegume , fruits_legumes_et_aromate.Libelle_FruitLegume FROM fruits_legumes_et_aromate; '''
     mycursor.execute(sql)
-    Fruits_Legumes_et_aromate = mycursor.fetchall()
+    fruits_legumes_et_aromate = mycursor.fetchall()
 
-    return render_template('recolte/edit_recolte.html' , Recolte = Recolte , Adherents = Adherents ,
-                           Parcelles = Parcelles , Fruits_Legumes_et_aromate = Fruits_Legumes_et_aromate)
+    return render_template('recolte/edit_recolte.html' , Recolte = recolte , Adherents = adherents ,
+                           Parcelles = parcelles , Fruits_Legumes_et_aromate = fruits_legumes_et_aromate)
 
 @app.route('/recolte/edit' , methods=['POST'])
 def valid_edit_recolte():

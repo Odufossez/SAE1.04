@@ -12,10 +12,10 @@
 
         <label for="Adherents"> Adhérents </label>
         <select name="Id_Adherent">
-        {% for adherent in Adherents %}
-            <option value="{{ adherent.Id_Adherent }}"
-            {% if Recolte.Id_Adherent is defined and adherent.Id_Adherent ==
-            Recolte.Id_Adherent %}selected{%endif%}> {{ adherent.NomPrenom }} </option>
+        {% for adherent in adherents %}
+        <option value="{{ adherent.Id_Adherent }}"
+            {% if recolte.Id_Adherent is defined and adherent.Id_Adherent == recolte.Id_Adherent %} selected {% endif %}
+        > {{ adherent.NomPrenom }} </option>
         {% endfor %}
         </select> <br>
 
@@ -24,7 +24,7 @@
         {% for parcelle in Parcelles %}
             <option value="{{ parcelle.Id_Parcelle }}"
             {% if Recolte.Id_Parcelle is defined and parcelle.Id_Parcelle ==
-            Recolte.Id_Parcelle %}selected{%endif%}> {{ parcelle.Nom_Parcelle }} </option>
+            Recolte.Id_Parcelle %} selected {% endif %}> {{ parcelle.Nom_Parcelle }} </option>
         {% endfor %}
         </select> <br>
 
