@@ -116,27 +116,30 @@ def edit_recolte():
     mycursor = get_db().cursor()
 
     idRecolte = request.args.get('Id_Recolte', '')
-    sql = ''' SELECT Adherent.NomPrenom as Nom , Recolte.Id_Parcelle as Parcelle , 
-        Recolte.Date_Recolte as Date ,
-        Libelle_FruitLegume as Plante, Recolte.Quantite as Quantité
-        FROM Recolte
+
+    #Récupération de la ligne dans la DB
+    sql = ''' SELECT Adherent.NomPrenom as Nom , Adherent.Id_Adherent, Recolte.Id_Parcelle as Parcelle ,
+       Recolte.Date_Recolte , Parcelle.Nom_Parcelle,
+       Libelle_FruitLegume as Plante, Recolte.Quantite
+FROM Recolte
         LEFT JOIN Adherent on Recolte.Id_Adherent = Adherent.Id_Adherent
-        RIGHT JOIN Fruits_Legumes_et_aromate on Id_Parcelle = Fruits_Legumes_et_aromate.Id_FruitLegume
-        LEFT JOIN Actions on Recolte.Id_Actions = Actions.Id_Actions
-        WHERE Actions.Id_Actions = 2 AND Recolte.Id_Recolte = %s ; '''
+        RIGHT JOIN Fruits_Legumes_et_aromate on Recolte.Id_plante = Fruits_Legumes_et_aromate.Id_FruitLegume
+        JOIN Parcelle on Recolte.Id_Parcelle = Parcelle.Id_Parcelle
+WHERE Recolte.Id_Recolte = %s ;'''
 
     mycursor.execute(sql , (idRecolte,))
     Recolte = mycursor.fetchone()
 
+    # RECUPERATION DES LISTES DÉROULANTES
     sql = '''  SELECT Adherent.NomPrenom FROM Adherent; '''
     mycursor.execute(sql)
     Adherents = mycursor.fetchall()
 
-    sql = '''  SELECT Parcelle.Id_Parcelle FROM Parcelle WHERE Plante_id IS NOT NULL; '''
+    sql = '''  SELECT Parcelle.Id_Parcelle , Parcelle.Nom_Parcelle FROM Parcelle; '''
     mycursor.execute(sql)
     Parcelles = mycursor.fetchall()
 
-    sql = '''  SELECT Fruits_Legumes_et_aromate.Libelle_FruitLegume FROM Fruits_Legumes_et_aromate; '''
+    sql = '''  SELECT Id_FruitLegume , Fruits_Legumes_et_aromate.Libelle_FruitLegume FROM Fruits_Legumes_et_aromate; '''
     mycursor.execute(sql)
     Fruits_Legumes_et_aromate = mycursor.fetchall()
 
@@ -149,17 +152,37 @@ def valid_edit_recolte():
 
     idAdherent = request.form.get('Id_Adherent', '')
     Id_Parcelle = request.form.get('Id_Parcelle', '')
-    Date = request.form.get('JJ_MM_AAAA', '')
+    Date = request.form.get('Date_Recolte', '')
     Id_FruitLegume = request.form.get('Id_FruitLegume', '')
     Quantite = request.form.get('Quantite', '')
+    Recolte_complete = request.form.get('Recolte_complete', '')  # indicateur de si la parcelle est vide ou non
 
-    tuple_insert = (Id_FruitLegume, Id_Parcelle)
-    sql = '''  INSERT INTO Parcelle (Plante_id) VALUE (%s) WHERE Id_Parcelle = %s;'''
-    mycursor.execute(sql, tuple_insert)
+    #Vide la parcelle si besoin else ajuste la valeur des plantes dessus au cas où
+    if (Recolte_complete == 'oui_recolte_complete'):
+        mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
+        mycursor.execute("ALTER TABLE Parcelle DISABLE KEYS;", )
 
-    tuple_insert = (idAdherent, Id_Parcelle, Date, Quantite)
-    sql = ''' INSERT INTO Recolte (Id_Adherent , Id_Parcelle , Date , Id_Action , Quantite) VALUES (%s, %s, %s, 2 ,%s);'''
-    mycursor.execute(sql, tuple_insert)
+        tuple_update = (Id_Parcelle)
+        sql = '''  UPDATE Parcelle SET Plante_id = NULL WHERE Id_Parcelle = %s; '''
+        mycursor.execute(sql, tuple_update)
+        get_db().commit()
+        mycursor.execute("ALTER TABLE Parcelle ENABLE KEYS;", )
+        mycursor.execute("SET FOREIGN_KEY_CHECKS=1;", )
+    else:
+        mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
+        mycursor.execute("ALTER TABLE Parcelle DISABLE KEYS;", )
+
+        tuple_update = (Id_FruitLegume , Id_Parcelle)
+        sql = '''  UPDATE Parcelle SET Plante_id = %s WHERE Id_Parcelle = %s; '''
+        mycursor.execute(sql, tuple_update)
+        get_db().commit()
+        mycursor.execute("ALTER TABLE Parcelle ENABLE KEYS;", )
+        mycursor.execute("SET FOREIGN_KEY_CHECKS=1;", )
+
+
+    tuple_update = (idAdherent, Id_Parcelle, Date, Quantite)
+    sql = ''' UPDATE Recolte SET Id_Adherent = %s , Id_Parcelle = %s , Date_Recolte = %s , Quantite = %s'''
+    mycursor.execute(sql, tuple_update)
 
     message = (u'Récolte modifiée : Adhérent : ' + idAdherent + ' --Parcelle : ' + Id_Parcelle +
                ' --Plante : ' + Id_FruitLegume + ' --Date : ' + Date + ' --Quantite : ' + Quantite)
@@ -173,7 +196,7 @@ def delete_recolte():
 
     id_delete = request.args.get('Id_Recolte', '')
     tuple_delete = (id_delete,)
-    sql = ''' DELETE FROM Recolte WHERE Id_Recolte = %s;'''
+    sql = '''DELETE FROM Recolte WHERE Id_Recolte = %s;'''
 
     mycursor.execute(sql , tuple_delete)
     get_db().commit()

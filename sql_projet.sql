@@ -330,3 +330,13 @@ INSERT INTO Recolte(id_adherent, id_parcelle, id_plante, date_recolte, id_action
                                                                                                  (4,4,2,'2024-03-03',2,3);
 SELECT * FROM Recolte where Id_Actions=2;
 ALTER TABLE Parcelle DISABLE KEYS;
+
+-- RÉCUPÉRATION D'UNE LIGNE DE RÉCOLTE POUR LE EDIT
+SELECT Adherent.NomPrenom as Nom , Recolte.Id_Parcelle as Parcelle ,
+       Recolte.Date_Recolte, Parcelle.Nom_Parcelle,
+       Libelle_FruitLegume as Plante, Recolte.Quantite
+FROM Recolte
+        LEFT JOIN Adherent on Recolte.Id_Adherent = Adherent.Id_Adherent
+        RIGHT JOIN Fruits_Legumes_et_aromate on Recolte.Id_plante = Fruits_Legumes_et_aromate.Id_FruitLegume
+        JOIN Parcelle on Recolte.Id_Parcelle = Parcelle.Id_Parcelle
+WHERE Recolte.Id_Recolte = 3 ;
