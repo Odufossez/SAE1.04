@@ -32,8 +32,8 @@
         <select name = "Id_FruitLegume" >
         {% for plante in Fruits_Legumes_et_aromate %}
             <option value="{{ plante.Id_FruitLegume }}"
-            {% if Recolte.Id_FruitLegume is defined and plante.Id_FruitLegume ==
-            Recolte.Id_FruitLegume %}selected{%endif%}> {{ plante.Libelle_FruitLegume }} </option>
+            {% if Recolte.Id_plante is defined and plante.Id_FruitLegume ==
+            Recolte.Id_plante %}selected{%endif%}> {{ plante.Libelle_FruitLegume }} </option>
         {% endfor %}
         </select>
 
@@ -42,7 +42,7 @@
                placeholder="" required>
 
         <label for="Quantite"></label>
-        <input id="Quantite" type="number" name="Quantite" min="0.0" max="99.9" value="{{Recolte.Quantite}}"
+        <input id="Quantite" type="number" name="Quantite" min="0.0" max="99.9" step="0.01" value="{{Recolte.Quantite}}"
                placeholder="" required> <br>
 
         <label for="Recolte_complete"> La parcelle est-elle vide ? </label>
