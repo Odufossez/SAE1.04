@@ -92,24 +92,21 @@ def valid_add_recolte():
 
     #Récupération de la plante sur la parcelle sélectionnée
     tuple_plante = (Id_Parcelle)
-    sql = ''' SELECT Fruits_Legumes_et_aromate.Libelle_FruitLegume FROM Fruits_Legumes_et_aromate
-    JOIN Parcelle on Parcelle.Plante_id = Fruits_Legumes_et_aromate.Id_FruitLegume
-    WHERE Parcelle.Id_Parcelle = %s; '''
-    plante = mycursor.execute(sql, tuple_plante)
+    sql = ''' SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s '''
+    id_plante = mycursor.execute(sql, tuple_plante)
 
+    #Conversion en string
+    id_plante = str(id_plante)
 
-    tuple_plante_id = (plante)
-    sql = ''' SELECT Id_FruitLegume FROM Fruits_Legumes_et_aromate WHERE Libelle_FruitLegume LIKE '%s'; '''
-    id_plante = mycursor.execute(sql, tuple_plante_id)
-
+    #Insertion dans la table récolte
     tuple_insert = (idAdherent , Id_Parcelle , id_plante , Date , Quantite)
-    sql = ''' INSERT INTO Recolte (Id_Adherent , Id_Parcelle , Id_Plante , Date_Recolte , Id_Actions , Quantite) 
-    VALUES (%s, %s, %s, %s, 2 ,%s);'''
+    sql = ''' INSERT INTO Recolte (Id_Adherent, Id_Parcelle, Id_plante , Date_Recolte , Id_Actions , Quantite) VALUES 
+    (%s , %s , %s , %s , 2 , %s);'''
     mycursor.execute(sql, tuple_insert)
     get_db().commit()
 
     message = (u'Récolte ajoutée : Adhérent : ' + idAdherent + ' --Parcelle : ' + Id_Parcelle +
-               ' --Plante : ' + plante + ' --Date : ' + Date + ' --Quantite : ' + Quantite)
+               ' --Plante : ' + id_plante + ' --Date : ' + Date + ' --Quantite : ' + Quantite)
     print(message)
     flash(message, 'alert-success')
     return redirect(url_for('show_recolte'))

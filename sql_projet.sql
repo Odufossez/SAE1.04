@@ -324,4 +324,9 @@ SELECT Fruits_Legumes_et_aromate.Libelle_FruitLegume FROM Fruits_Legumes_et_arom
 JOIN Parcelle on Parcelle.Plante_id = Fruits_Legumes_et_aromate.Id_FruitLegume
 WHERE Parcelle.Id_Parcelle = 5;
 
+SELECT Fruits_Legumes_et_aromate.Id_FruitLegume FROM Fruits_Legumes_et_aromate WHERE Libelle_FruitLegume = 'Persil';
+
+INSERT INTO Recolte(id_adherent, id_parcelle, id_plante, date_recolte, id_actions, quantite) VALUES
+                                                                                                 (4,4,2,'2024-03-03',2,3);
+SELECT * FROM Recolte where Id_Actions=2;
 ALTER TABLE Parcelle DISABLE KEYS;
