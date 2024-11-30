@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+ <title> Modifier une parcelle </title>
+{% endblock %}
+
+{% block body %}
+<h2> Modifier une parcelle </h2>
+<form method="post" action="/parcelle/edit">
+    <fieldset>
+        <legend> Modifier une parcelle </legend>
+
+
+        <label for="Id_Parcelle"> Parcelle </label>
+        <select name="Id_Parcelle" >
+        {% for parcelle in Parcelles %}
+            <option value="{{ parcelle.Id_Parcelle }}"
+            {% if Recolte.Id_Parcelle is defined and parcelle.Id_Parcelle ==
+            Recolte.Id_Parcelle %} selected {% endif %}> {{ parcelle.Nom_Parcelle }} </option>
+        {% endfor %}
+        </select> <br>
+
+        <label for="Nom_Parcelle"> Nom_Parcelle </label>
+        <select name = "Nom_Parcelle" ></select>
+
+        <label for="Surface"> Surface de la parcelle </label>
+        <input id="surface" type="NUMERIC(4,2)" name="Surface_Parcelle" value="{{Parcelle.Surface.Parcelle}}"
+               placeholder="" required>
+
+        <label for="Id_plante"></label>
+        <input id="Id_Plante" type="INT" name="Id_Plante" min="0" max="99" step="1" value="{{Parcelle.Id_plante}}"
+               placeholder="" required> <br>
+
+
+        <input type="submit" value="Creer" name="Valider">
+    </fieldset>
+</form>
+{% endblock %}
