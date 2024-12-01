@@ -10,25 +10,22 @@
     <fieldset>
         <legend> Créer une parcelle </legend>
 
-        <label for="Id_Parcelle"> Parcelle </label>
-        <select name="Id_Parcelle" required>
-        <option value="">Sélectionner une parcelle</option>
-            {% for parcelle in Parcelle %}
-            <option value="{{ Parcelle.Id_Parcelle }}"> {{ Parcelle.Nom_Parcelle }}</option>
+        <label for="Plante_id"> Plante </label>
+        <select name="Plante_id">
+        <option value="">Sélectionner une plante</option>
+            {% for plante in Plantes %}
+            <option value="{{ plante.Id_FruitLegume }}"> {{ plante.Libelle_FruitLegume }}</option>
             {% endfor %}
         </select> <br>
 
+        <label for="Nom_Parcelle"> Entrer nom de parcelle (Colonne Ligne, ex B6) </label>
+        <input id="Nom_Parcelle" type="text" name="Nom_Parcelle" size="4" value=""
+               placeholder="Nom" required>
 
-        <label for="Nom_Parcelle"> Nom </label>
-        <input id="Nom_Parcelle" type="VARCHAR(4)" name="Nom de parcelle" size="25" value=""
-               placeholder="" required>
-
-        <label for="Surface"> Date de la récolte </label>
-        <input id="Surface" type="NUMERIC(4,2)" name="Surface" size="25" value=""
-               placeholder="" required>
-
-        <label for="Plante_id"></label>
-        <input id="Plante_id" type="INT" name="Plante_id" min="0.0" max="99.9" value="" required> <br>
+        <label for="Surface"> Surface de la parcelle </label>
+        <input id="Surface" type="number" name="Surface" min="" max="" step="0.01"
+               placeholder="Entrer la surface en mètre carré" required>
+        <br>
 
         <input type="submit" value="Creer" name="Valider">
     </fieldset>

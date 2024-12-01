@@ -245,51 +245,57 @@ def delete_recolte():
 def show_parcelle():
     mycursor = get_db().cursor()
 
-    sql = ''' SELECT * 
-            From Parcelle'''
+    sql = ''' SELECT Parcelle.Id_Parcelle , Nom_Parcelle , Fruits_Legumes_et_aromate.Libelle_FruitLegume as Plante, 
+    Surface
+    FROM Parcelle
+    JOIN Fruits_Legumes_et_aromate on Parcelle.Plante_id = Fruits_Legumes_et_aromate.Id_FruitLegume;'''
 
     mycursor.execute(sql)
-    parcelle = mycursor.fetchall()
+    parcelles = mycursor.fetchall()
 
-    return render_template('parcelle/show_parcelle.html' , parcelles = parcelles)
+    sql = ''' SELECT Id_Parcelle ,  Nom_Parcelle , Surface FROM Parcelle WHERE Plante_id IS NULL OR Plante_id = ' ' '''
+    mycursor.execute(sql)
+    parcelles_vide = mycursor.fetchall()
+
+    return render_template('parcelle/show_parcelle.html' , parcelles = parcelles ,
+                           parcelles_vide = parcelles_vide)
 
 @app.route('/parcelle/add' , methods=['GET'])
 def add_parcelle():
     mycursor = get_db().cursor()
 
-    # Liste des adhérents
-    sql = '''  SELECT Parcelle.Id_Parcelle , Parcelle.Nom_Parcelle FROM Parcelle; '''
+    # Liste des plantes
+    sql = '''  SELECT * FROM Fruits_Legumes_et_aromate; '''
     mycursor.execute(sql)
-    Parcelle = mycursor.fetchall()
+    Plantes = mycursor.fetchall()
 
-    # donne la plante plantes actuellement dans la parcelle
-    sql = '''  SELECT Parcelle.Nom_Parcelle, Fruits_Legumes_et_aromate.Libelle_FruitLegume
-            FROM Parcelle
-            Join Fruits_Legumes_et_aromate
-                on Fruits_Legumes_et_aromate.Id_FruitLegume = Parcelle.Plante_id; '''
-    mycursor.execute(sql)
-    Parcelles = mycursor.fetchall()
-
-    return render_template('parcelle/add_parcelle.html' , Parcelle = Parcelles)
+    return render_template('parcelle/add_parcelle.html' , Plantes = Plantes)
 
 @app.route('/parcelle/add' , methods=['POST'])
 def valid_add_parcelle():
     mycursor = get_db().cursor()
 
-    Id_Parcelle = request.form.get('Id_Parcelle', '')
     Nom_Parcelle = request.form.get('Nom_Parcelle', '')
     Surface = request.form.get('Surface', '')
-    Plante_id = request.form.get('Plante_id', '') #indicateur de si la parcelle est vide ou non
+    Plante_id = request.form.get('Plante_id', '')
 
+    if (Plante_id != ''):
+        Plante_id = int(Plante_id) #Pour le sql
+        # Insertion dans la table parcelle
+        tuple_insert = (Nom_Parcelle, Surface, Plante_id)
+        sql = ''' INSERT INTO Parcelle (Nom_Parcelle, Surface , Plante_id) VALUES (%s , %s , %s);'''
+        mycursor.execute(sql, tuple_insert)
+        get_db().commit()
+        Plante_id = str(Plante_id) #Pour le message
+    else:
+        # Insertion dans la table parcelle
+        tuple_insert = (Nom_Parcelle, Surface)
+        sql = ''' INSERT INTO Parcelle (Nom_Parcelle, Surface) VALUES (%s , %s);'''
+        mycursor.execute(sql, tuple_insert)
+        get_db().commit()
 
-    #Insertion dans la table récolte
-    tuple_insert = (Id_Parcelle , Nom_Parcelle , Surface , Plante_id )
-    sql = ''' INSERT INTO Recolte (Id_Parcelle, Nom_Parcelle, Surface , Plante_id) VALUES 
-    (%s , %s , %s , %s);'''
-    mycursor.execute(sql, tuple_insert)
-    get_db().commit()
-
-    message = (u'Parcellle Id : ' + Id_Parcelle + ' --Nom parcelle : ' + Nom_Parcelle + ' --Surface : ' + Surface + ' --Plante_id : ' + Plante_id)
+    message = (u' Nouvelle Parcelle : Nom parcelle : ' + Nom_Parcelle + ' --Surface : ' + Surface +
+               ' --Plante_id : ' + Plante_id)
     print(message)
     flash(message, 'alert-success')
     return redirect(url_for('show_parcelle'))
@@ -299,67 +305,66 @@ def valid_add_parcelle():
 def edit_parcelle():
     mycursor = get_db().cursor()
 
-    idParcelle = request.args.get('Id_Recolte', '')
+    idParcelle = request.args.get('Id_Parcelle', '')
 
     #Récupération de la ligne dans la DB
-    sql = ''' SELECT Parcelle.Id_Parcelle, Parcelle.Nom_Parcelle, Parcelle.Surface,
-        Parcelle.Id_plante , Fruits_Legumes_et_aromate.Libelle_FruitLegume,
+    sql = ''' SELECT Parcelle.Id_Parcelle, Parcelle.Nom_Parcelle as Nom, Parcelle.Surface,
+        Parcelle.Plante_id , Fruits_Legumes_et_aromate.Libelle_FruitLegume , Fruits_Legumes_et_aromate.Id_FruitLegume
         FROM Parcelle
-        RIGHT JOIN Fruits_Legumes_et_aromate on Parcelle.Id_plante = Fruits_Legumes_et_aromate.Id_FruitLegume
+        RIGHT JOIN Fruits_Legumes_et_aromate on Parcelle.Plante_id = Fruits_Legumes_et_aromate.Id_FruitLegume
         WHERE Parcelle.Id_Parcelle = %s ;'''
 
     mycursor.execute(sql , (idParcelle,))
-    parcelle = mycursor.fetchone()
+    Parcelle = mycursor.fetchone()
 
-    # RECUPERATION DES LISTES DÉROULANTES
-    sql = '''  SELECT Parcelle.Id_Parcelle , Parcelle.Nom_Parcelle FROM Parcelle; '''
-    mycursor.execute(sql)
-    parcelles = mycursor.fetchall()
+    # RECUPERATION DE LA LISTE DÉROULANTE DES PLANTES
+    sql = '''  SELECT * FROM Fruits_Legumes_et_aromate; '''
+    mycursor.execute(sql,)
+    Plantes = mycursor.fetchall()
 
-   return render_template('parcelle/edit_parcelle.html' , Parcelles = parcelles)
+    return render_template('parcelle/edit_parcelle.html' , Parcelle = Parcelle , Plantes = Plantes)
 
 
 @app.route('/parcelle/edit' , methods=['POST'])
 def valid_edit_parcelle():
     mycursor = get_db().cursor()
 
-    Id_Parcelle = request.args.get('Id_Parcelle', '')
+    Id_Parcelle = request.args.get('Id_Parcelle', '') #ne change jamais
 
-
-    Id_Parcelle_form = request.form.get('Id_Parcelle', '')
-    #Si la valeur du champ n'a pas changé, récupérer celle précédente
-    if Id_Parcelle_form == ' ':
-        Id_Parcelle = mycursor.execute("SELECT Id_Parcelle FROM Recolte WHERE Id_Recolte = %s" )
-    else:
-        Id_Parcelle = Id_Parcelle_form
-
-    Nom_Parcelle_form = request.form.get('Nom Parcelle', '')
+    Nom_Parcelle_form = request.form.get('Nom_Parcelle', '')
     # Si la valeur du champ n'a pas changé, récupérer celle précédente
     if Nom_Parcelle_form == ' ':
-        Nom_Parcelle = mycursor.execute("SELECT Nom_Parcelle FROM Parcelle WHERE Id_Parcelle = %s" )
+        Nom_Parcelle = mycursor.execute("SELECT Nom_Parcelle FROM Parcelle WHERE Id_Parcelle = %s", Id_Parcelle)
     else:
         Nom_Parcelle = Nom_Parcelle_form
 
-    Surface_form = request.form.get('Surface', '')
+    Surface_form = request.form.get('Surface_Parcelle', '')
     # Si la valeur du champ n'a pas changé, récupérer celle précédente
     if Surface_form == ' ':
-        Surface = mycursor.execute("SELECT Surface FROM Parcelle WHERE Surface = %s")
+        Surface = mycursor.execute("SELECT Surface FROM Parcelle WHERE Surface = %s",Id_Parcelle)
     else:
         Surface = Surface_form
-
 
     Id_FruitLegume_form = request.form.get('Id_FruitLegume', '')
     # Si la valeur du champ n'a pas changé, récupérer celle précédente
     if Id_FruitLegume_form == ' ':
-        Id_FruitLegume = mycursor.execute("SELECT Id_plante FROM Parcelle WHERE Id_ = %s")
+        Id_FruitLegume = mycursor.execute("SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s", Id_Parcelle)
+    elif Id_FruitLegume_form == 'vide':
+        Id_FruitLegume = 'NULL'
     else:
         Id_FruitLegume = Id_FruitLegume_form
 
 
-    message = (u'Parcelle modifier id : ' + Id_Parcelle +
-               ' --Nom : ' + Id_FruitLegume + ' --surface : ' + Surface + ' --id_plante : ' + Id_Plante)
+    #mise à jour de la table PARCELLE
+    tuple_update = (Nom_Parcelle,Surface,Id_FruitLegume,Id_Parcelle)
+    sql = ''' UPDATE Parcelle SET Nom_Parcelle = %s , Surface = %s , Plante_id = %s WHERE Id_Parcelle = %s;'''
+    mycursor.execute(sql,tuple_update)
+    get_db().commit()
+
+    message = (u'Parcelle modifiée id : ' + Id_Parcelle +
+               ' --Nom : ' + Nom_Parcelle + ' --surface : ' + Surface + ' --id_plante : ' + Id_FruitLegume)
     print(message)
     flash(message, 'alert-success')
-    return redirect(url_for('show_recolte'))
+    return redirect(url_for('show_parcelle'))
 
 

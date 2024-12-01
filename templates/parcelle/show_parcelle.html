@@ -12,7 +12,7 @@
 <table class="table">
     <thead class="thead-dark">
         <tr>
-            <th>ID</th><th>Nom</th><th>Surface</th><th>id_plante</th>
+            <th>ID</th><th>Nom</th><th>Surface</th><th>Plante</th>
         </tr>
     </thead>
     <tbody>
@@ -25,6 +25,37 @@
                <td>{{ ligne.Plante }}</td>
 
                <td>
+                   <a class= "lien_tab" href="/parcelle/edit?Id_Parcelle={{ ligne.Id_Parcelle }}">Éditer</a>
+                   <a class= "lien_tab" href="/parcelle/delete?Id_Parcelle={{ ligne.Id_Parcelle }}" >Supprimer</a>
+               </td>
+           </tr>
+        {% endfor %}
+    {% else %}
+            <tr>
+                  <td>
+                      Pas de parcelles
+                  </td>
+           </tr>
+    {% endif %}
+    </tbody>
+</table>
+<br><br>
+<h2> PARCELLES INNOCUPÉES </h2>
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th><th>Nom</th><th>Surface</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% if parcelles | length >= 1 %}
+        {% for ligne in parcelles_vide %}
+           <tr>
+               <td> {{ ligne.Id_Parcelle }}</td>
+               <td> {{ ligne.Nom_Parcelle }}</td>
+               <td> {{ ligne.Surface }} </td>
+
+               <td>
                    <a class= "lien_tab" href="/parcelle/edit?Id_Recolte={{ ligne.Id_Parcelle }}">Éditer</a>
                    <a class= "lien_tab" href="/parcelle/delete?Id_Recolte={{ ligne.Id_Parcelle }}" >Supprimer</a>
                </td>
@@ -33,7 +64,7 @@
     {% else %}
             <tr>
                   <td>
-                      Pas de parcelles
+                      Pas de parcelles vide
                   </td>
            </tr>
     {% endif %}

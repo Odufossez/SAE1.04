@@ -8,31 +8,26 @@
 <h2> Modifier une parcelle </h2>
 <form method="post" action="/parcelle/edit">
     <fieldset>
-        <legend> Modifier une parcelle </legend>
+        <legend>Modification de la parcelle {{Parcelle.Id_Parcelle}}</legend>
 
-
-        <label for="Id_Parcelle"> Parcelle </label>
-        <select name="Id_Parcelle" >
-        {% for parcelle in Parcelles %}
-            <option value="{{ parcelle.Id_Parcelle }}"
-            {% if Recolte.Id_Parcelle is defined and parcelle.Id_Parcelle ==
-            Recolte.Id_Parcelle %} selected {% endif %}> {{ parcelle.Nom_Parcelle }} </option>
-        {% endfor %}
-        </select> <br>
-
-        <label for="Nom_Parcelle"> Nom_Parcelle </label>
-        <select name = "Nom_Parcelle" ></select>
+        <label for="Nom_Parcelle"> Nom de la Parcelle </label>
+        <input id="Nom_Parcelle" name="Nom_Parcelle" type="text" size="4" value="{{Parcelle.Nom}}">
 
         <label for="Surface"> Surface de la parcelle </label>
-        <input id="surface" type="NUMERIC(4,2)" name="Surface_Parcelle" value="{{Parcelle.Surface.Parcelle}}"
+        <input id="surface" type="number" name="Surface_Parcelle" step="0.01" value="{{Parcelle.Surface}}"
                placeholder="" required>
 
-        <label for="Id_plante"></label>
-        <input id="Id_Plante" type="INT" name="Id_Plante" min="0" max="99" step="1" value="{{Parcelle.Id_plante}}"
-               placeholder="" required> <br>
+        <label for="Id_FruitLegume"> Plante </label>
+        <select name = "Id_FruitLegume" >
+            <option value="vide"> Parcelle vide </option>
+        {% for plante in Plantes %}
+            <option value="{{ plante.Id_FruitLegume }}"
+            {% if Parcelle.Plante_id is defined and plante.Id_FruitLegume ==
+            Parcelle.Plante_id %}selected{%endif%}> {{ plante.Libelle_FruitLegume }} </option>
+        {% endfor %}
+        </select>
 
-
-        <input type="submit" value="Creer" name="Valider">
+        <input type="submit" value="Modifier" name="Valider">
     </fieldset>
 </form>
 {% endblock %}
