@@ -253,7 +253,8 @@ def show_parcelle():
     mycursor.execute(sql)
     parcelles = mycursor.fetchall()
 
-    sql = ''' SELECT Id_Parcelle ,  Nom_Parcelle , Surface FROM Parcelle WHERE Plante_id IS NULL OR Plante_id = ' ' '''
+    # RÉCUPÉRATION DES PARCELLES INNOCUPÉES
+    sql = ''' SELECT Id_Parcelle ,  Nom_Parcelle , Surface FROM Parcelle WHERE Plante_id IS NULL OR Plante_id = ' '; '''
     mycursor.execute(sql)
     parcelles_vide = mycursor.fetchall()
 
@@ -306,13 +307,20 @@ def edit_parcelle():
     mycursor = get_db().cursor()
 
     idParcelle = request.args.get('Id_Parcelle', '')
+    plante_vide = mycursor.execute("SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s", idParcelle)
 
-    #Récupération de la ligne dans la DB
-    sql = ''' SELECT Parcelle.Id_Parcelle, Parcelle.Nom_Parcelle as Nom, Parcelle.Surface,
-        Parcelle.Plante_id , Fruits_Legumes_et_aromate.Libelle_FruitLegume , Fruits_Legumes_et_aromate.Id_FruitLegume
-        FROM Parcelle
-        RIGHT JOIN Fruits_Legumes_et_aromate on Parcelle.Plante_id = Fruits_Legumes_et_aromate.Id_FruitLegume
+    #si la plante est vide, la récupération de la ligne n'est pas la même pour éviter des champs vides
+    if plante_vide == '':
+        #Récupération de la ligne dans la DB
+        sql = ''' SELECT Parcelle.Id_Parcelle, Parcelle.Nom_Parcelle as Nom, Parcelle.Surface FROM Parcelle
         WHERE Parcelle.Id_Parcelle = %s ;'''
+    else:
+        # Récupération de la ligne dans la DB
+        sql = ''' SELECT Parcelle.Id_Parcelle, Parcelle.Nom_Parcelle as Nom, Parcelle.Surface,
+                Parcelle.Plante_id , Fruits_Legumes_et_aromate.Libelle_FruitLegume , Fruits_Legumes_et_aromate.Id_FruitLegume
+                FROM Parcelle
+                RIGHT JOIN Fruits_Legumes_et_aromate on Parcelle.Plante_id = Fruits_Legumes_et_aromate.Id_FruitLegume
+                WHERE Parcelle.Id_Parcelle = %s ;'''
 
     mycursor.execute(sql , (idParcelle,))
     Parcelle = mycursor.fetchone()
@@ -353,7 +361,6 @@ def valid_edit_parcelle():
         Id_FruitLegume = 'NULL'
     else:
         Id_FruitLegume = Id_FruitLegume_form
-
 
     #mise à jour de la table PARCELLE
     tuple_update = (Nom_Parcelle,Surface,Id_FruitLegume,Id_Parcelle)
