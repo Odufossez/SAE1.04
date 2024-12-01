@@ -375,3 +375,23 @@ def valid_edit_parcelle():
     return redirect(url_for('show_parcelle'))
 
 
+@app.route('/parcelle/delete' , methods=['GET'])
+def delete_recolte():
+    mycursor = get_db().cursor()
+    
+    Id_Parcelle = request.args.get('Id_Parcelle', '')
+    plante_vide = mycursor.execute("SELECT Id_Plante FROM Parcelle WHERE Id_Parcelle = %s;", Id_Parcelle)
+    if (plante_vide != ''):
+        flash(u'Une parcelle ne peut pas être supprimée: ' + Id_Parcelle , 'alerte-warning')
+    else :
+        id_delete = request.args.get('Id_Parcelle', '')
+        tuple_delete = (id_delete,)
+        sql = '''DELETE FROM Parcelle WHERE Id_Parcelle = %s;'''
+        mycursor.execute(sql, tuple_delete)
+        get_db().commit()
+
+        flash(u'Une parcelle a été supprimée : ' + id_delete, 'alerte-warning')
+        
+    return redirect('/recolte/show')
+
+
