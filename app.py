@@ -187,6 +187,13 @@ def valid_edit_recolte():
     else:
         Quantite = Quantite_form
 
+    tuple_update = (idAdherent, Id_Parcelle, Date, Quantite, Id_FruitLegume, Id_Recolte)
+    sql = ''' UPDATE Recolte SET Id_Adherent = %s , Id_Parcelle = %s , Date_Recolte = %s , Quantite = %s , 
+        Id_plante = %s
+        WHERE Id_Recolte = %s; '''
+    mycursor.execute(sql, tuple_update)
+    get_db().commit()
+
     Recolte_complete = request.form.get('Recolte_complete', '')  # indicateur de si la parcelle est vide ou non
     #Vide la parcelle si besoin else ajuste la valeur des plantes dessus au cas où
     if (Recolte_complete == 'oui_recolte_complete'):
@@ -210,13 +217,6 @@ def valid_edit_recolte():
         mycursor.execute("ALTER TABLE Parcelle ENABLE KEYS;", )
         mycursor.execute("SET FOREIGN_KEY_CHECKS=1;", )
 
-
-    tuple_update = (idAdherent, Id_Parcelle, Date, Quantite , Id_FruitLegume , Id_Recolte)
-    sql = ''' UPDATE Recolte SET Id_Adherent = %s , Id_Parcelle = %s , Date_Recolte = %s , Quantite = %s , 
-    Id_plante = %s
-    WHERE Id_Recolte = %s; '''
-    mycursor.execute(sql, tuple_update)
-    get_db().commit()
 
     message = (u'Récolte modifiée :' + Id_Recolte + 'Adhérent : ' + idAdherent + ' --Parcelle : ' + Id_Parcelle +
                ' --Plante : ' + Id_FruitLegume + ' --Date : ' + Date + ' --Quantite : ' + Quantite)
@@ -382,8 +382,8 @@ def delete_parcelle():
     
     Id_Parcelle = request.args.get('Id_Parcelle', '')
     plante_vide = mycursor.execute("SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s;", Id_Parcelle)
-    plante_vide = str(plante_vide) #conversion pour comparaison
-    if (plante_vide != 'NULL') or (plante_vide == ' '):
+    plante_vide = str(plante_vide)#conversion pour comparaison
+    if (plante_vide == 'NULL'):
         flash(u'Une parcelle ne peut pas être supprimée: ' + Id_Parcelle , 'alerte-warning')
     else :
         id_delete = request.args.get('Id_Parcelle', '')
