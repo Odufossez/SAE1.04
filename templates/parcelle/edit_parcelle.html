@@ -10,15 +10,17 @@
     <fieldset>
         <legend>Modification de la parcelle {{Parcelle.Id_Parcelle}}</legend>
 
+        <input type="hidden" name="Id_Parcelle" size="18" value="{{ Parcelle.Id_Parcelle }}" id="Id_Parcelle">
+
         <label for="Nom_Parcelle"> Nom de la Parcelle </label>
-        <input id="Nom_Parcelle" name="Nom_Parcelle" type="text" size="4" value="{{Parcelle.Nom}}">
+        <input id="Nom_Parcelle" name="Nom_Parcelle" type="text" size="4" value="{{Parcelle.Nom_Parcelle}}">
 
         <label for="Surface"> Surface de la parcelle </label>
-        <input id="surface" type="number" name="Surface_Parcelle" step="0.01" value="{{Parcelle.Surface}}"
+        <input id="Surface" type="number" name="Surface" step="0.01" value="{{Parcelle.Surface}}"
                placeholder="" required>
 
         <label for="Id_FruitLegume"> Plante </label>
-        <select name = "Id_FruitLegume" >
+        <select name = "Id_FruitLegume" id="Id_FruitLegume" >
             <option value="vide"> Parcelle vide </option>
         {% for plante in Plantes %}
             <option value="{{ plante.Id_FruitLegume }}"

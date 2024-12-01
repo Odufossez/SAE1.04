@@ -10,8 +10,10 @@
     <fieldset>
         <legend> Modifier une récolte </legend>
 
+        <input type="hidden" name="Id_Recolte" size="18" value="{{ Recolte.Id_Recolte }}" id="Id_Recolte">
+
         <label for="Adherents"> Adhérents </label>
-        <select name="Id_Adherent">
+        <select name="Id_Adherent" id="Adherents">
         {% for adherent in Adherents %}
         <option value="{{ adherent.Id_Adherent }}"
             {% if Recolte.Id_Adherent is defined and adherent.Id_Adherent == Recolte.Id_Adherent %} selected {% endif %}
@@ -20,7 +22,7 @@
         </select> <br>
 
         <label for="Id_Parcelle"> Parcelle </label>
-        <select name="Id_Parcelle" >
+        <select name="Id_Parcelle" id="Id_Parcelle">
         {% for parcelle in Parcelles %}
             <option value="{{ parcelle.Id_Parcelle }}"
             {% if Recolte.Id_Parcelle is defined and parcelle.Id_Parcelle ==
@@ -29,7 +31,7 @@
         </select> <br>
 
         <label for="Id_FruitLegume"> Plante </label>
-        <select name = "Id_FruitLegume" >
+        <select name = "Id_FruitLegume" id="Id_FruitLegume">
         {% for plante in Fruits_Legumes_et_aromate %}
             <option value="{{ plante.Id_FruitLegume }}"
             {% if Recolte.Id_plante is defined and plante.Id_FruitLegume ==
@@ -46,7 +48,7 @@
                placeholder="" required> <br>
 
         <label for="Recolte_complete"> La parcelle est-elle vide ? </label>
-        <select name="Recolte_complete" required>
+        <select name="Recolte_complete" id="Recolte_complete" required>
         <option value=""> Sélectionner "oui" s'il n'y a plus de plante à récolter</option>
             <option value="oui_recolte_complete"> Oui </option>
             <option value="non_recolte_complete"> Non </option>

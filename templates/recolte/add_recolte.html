@@ -19,7 +19,7 @@
         </select> <br>
 
         <label for="Id_Parcelle"> Parcelle </label>
-        <select name="Id_Parcelle" required>
+        <select name="Id_Parcelle" id="Id_Parcelle" required>
         <option value="">Sélectionner une parcelle</option>
             {% for parcelle in Parcelle %}
             <option value="{{ parcelle.Id_Parcelle }}"> {{ parcelle.Nom_Parcelle }}</option>
@@ -36,7 +36,7 @@
                placeholder="Kg" required> <br>
 
         <label for="Recolte_complete"> La parcelle est-elle vide ? </label>
-        <select name="Recolte_complete" required>
+        <select name="Recolte_complete" id="Recolte_complete" required>
         <option value=""> Sélectionner "oui" s'il n'y a plus de plante à récolter</option>
             <option value="oui_recolte_complete"> Oui </option>
             <option value="non_recolte_complete"> Non </option>

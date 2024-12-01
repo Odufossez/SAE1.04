@@ -218,7 +218,7 @@ def valid_edit_recolte():
     mycursor.execute(sql, tuple_update)
     get_db().commit()
 
-    message = (u'Récolte modifiée : Adhérent : ' + idAdherent + ' --Parcelle : ' + Id_Parcelle +
+    message = (u'Récolte modifiée :' + Id_Recolte + 'Adhérent : ' + idAdherent + ' --Parcelle : ' + Id_Parcelle +
                ' --Plante : ' + Id_FruitLegume + ' --Date : ' + Date + ' --Quantite : ' + Quantite)
     print(message)
     flash(message, 'alert-success')
@@ -301,22 +301,22 @@ def valid_add_parcelle():
     flash(message, 'alert-success')
     return redirect(url_for('show_parcelle'))
 
-
 @app.route('/parcelle/edit' , methods=['GET'])
 def edit_parcelle():
     mycursor = get_db().cursor()
 
     idParcelle = request.args.get('Id_Parcelle', '')
     plante_vide = mycursor.execute("SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s", idParcelle)
+    plante_vide = str(plante_vide)
 
     #si la plante est vide, la récupération de la ligne n'est pas la même pour éviter des champs vides
     if plante_vide == '':
         #Récupération de la ligne dans la DB
-        sql = ''' SELECT Parcelle.Id_Parcelle, Parcelle.Nom_Parcelle as Nom, Parcelle.Surface FROM Parcelle
+        sql = ''' SELECT Parcelle.Id_Parcelle, Parcelle.Nom_Parcelle, Parcelle.Surface FROM Parcelle
         WHERE Parcelle.Id_Parcelle = %s ;'''
     else:
         # Récupération de la ligne dans la DB
-        sql = ''' SELECT Parcelle.Id_Parcelle, Parcelle.Nom_Parcelle as Nom, Parcelle.Surface,
+        sql = ''' SELECT Parcelle.Id_Parcelle, Parcelle.Nom_Parcelle, Parcelle.Surface,
                 Parcelle.Plante_id , Fruits_Legumes_et_aromate.Libelle_FruitLegume , Fruits_Legumes_et_aromate.Id_FruitLegume
                 FROM Parcelle
                 RIGHT JOIN Fruits_Legumes_et_aromate on Parcelle.Plante_id = Fruits_Legumes_et_aromate.Id_FruitLegume
@@ -342,21 +342,22 @@ def valid_edit_parcelle():
     Nom_Parcelle_form = request.form.get('Nom_Parcelle', '')
     # Si la valeur du champ n'a pas changé, récupérer celle précédente
     if Nom_Parcelle_form == ' ':
-        Nom_Parcelle = mycursor.execute("SELECT Nom_Parcelle FROM Parcelle WHERE Id_Parcelle = %s", Id_Parcelle)
+        Nom_Parcelle = mycursor.execute("SELECT Nom_Parcelle FROM Parcelle WHERE Id_Parcelle = %s;", Id_Parcelle)
     else:
         Nom_Parcelle = Nom_Parcelle_form
 
-    Surface_form = request.form.get('Surface_Parcelle', '')
+    Surface_form = request.form.get('Surface', '')
     # Si la valeur du champ n'a pas changé, récupérer celle précédente
     if Surface_form == ' ':
-        Surface = mycursor.execute("SELECT Surface FROM Parcelle WHERE Surface = %s",Id_Parcelle)
+        Surface = mycursor.execute("SELECT Surface FROM Parcelle WHERE Surface = %s;",Id_Parcelle)
     else:
         Surface = Surface_form
 
     Id_FruitLegume_form = request.form.get('Id_FruitLegume', '')
     # Si la valeur du champ n'a pas changé, récupérer celle précédente
     if Id_FruitLegume_form == ' ':
-        Id_FruitLegume = mycursor.execute("SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s", Id_Parcelle)
+        Id_FruitLegume = mycursor.execute("SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s;", Id_Parcelle)
+        Id_FruitLegume = str(Id_FruitLegume)
     elif Id_FruitLegume_form == 'vide':
         Id_FruitLegume = 'NULL'
     else:
@@ -376,12 +377,13 @@ def valid_edit_parcelle():
 
 
 @app.route('/parcelle/delete' , methods=['GET'])
-def delete_recolte():
+def delete_parcelle():
     mycursor = get_db().cursor()
     
     Id_Parcelle = request.args.get('Id_Parcelle', '')
-    plante_vide = mycursor.execute("SELECT Id_Plante FROM Parcelle WHERE Id_Parcelle = %s;", Id_Parcelle)
-    if (plante_vide != ''):
+    plante_vide = mycursor.execute("SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s;", Id_Parcelle)
+    plante_vide = str(plante_vide) #conversion pour comparaison
+    if (plante_vide != 'NULL') or (plante_vide == ' '):
         flash(u'Une parcelle ne peut pas être supprimée: ' + Id_Parcelle , 'alerte-warning')
     else :
         id_delete = request.args.get('Id_Parcelle', '')
@@ -389,9 +391,8 @@ def delete_recolte():
         sql = '''DELETE FROM Parcelle WHERE Id_Parcelle = %s;'''
         mycursor.execute(sql, tuple_delete)
         get_db().commit()
-
         flash(u'Une parcelle a été supprimée : ' + id_delete, 'alerte-warning')
         
-    return redirect('/recolte/show')
+    return redirect('/parcelle/show')
 
 
