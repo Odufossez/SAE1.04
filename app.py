@@ -249,9 +249,9 @@ def show_parcelle():
             From Parcelle'''
 
     mycursor.execute(sql)
-    recoltes = mycursor.fetchall()
+    parcelle = mycursor.fetchall()
 
-    return render_template('recolte/show_recolte.html' , recoltes = recoltes)
+    return render_template('parcelle/show_parcelle.html' , parcelles = parcelles)
 
 @app.route('/parcelle/add' , methods=['GET'])
 def add_parcelle():
