@@ -293,3 +293,73 @@ def valid_add_parcelle():
     print(message)
     flash(message, 'alert-success')
     return redirect(url_for('show_parcelle'))
+
+
+@app.route('/parcelle/edit' , methods=['GET'])
+def edit_parcelle():
+    mycursor = get_db().cursor()
+
+    idParcelle = request.args.get('Id_Recolte', '')
+
+    #Récupération de la ligne dans la DB
+    sql = ''' SELECT Parcelle.Id_Parcelle, Parcelle.Nom_Parcelle, Parcelle.Surface,
+        Parcelle.Id_plante , Fruits_Legumes_et_aromate.Libelle_FruitLegume,
+        FROM Parcelle
+        RIGHT JOIN Fruits_Legumes_et_aromate on Parcelle.Id_plante = Fruits_Legumes_et_aromate.Id_FruitLegume
+        WHERE Parcelle.Id_Parcelle = %s ;'''
+
+    mycursor.execute(sql , (idParcelle,))
+    parcelle = mycursor.fetchone()
+
+    # RECUPERATION DES LISTES DÉROULANTES
+    sql = '''  SELECT Parcelle.Id_Parcelle , Parcelle.Nom_Parcelle FROM Parcelle; '''
+    mycursor.execute(sql)
+    parcelles = mycursor.fetchall()
+
+   return render_template('parcelle/edit_parcelle.html' , Parcelles = parcelles)
+
+
+@app.route('/parcelle/edit' , methods=['POST'])
+def valid_edit_parcelle():
+    mycursor = get_db().cursor()
+
+    Id_Parcelle = request.args.get('Id_Parcelle', '')
+
+
+    Id_Parcelle_form = request.form.get('Id_Parcelle', '')
+    #Si la valeur du champ n'a pas changé, récupérer celle précédente
+    if Id_Parcelle_form == ' ':
+        Id_Parcelle = mycursor.execute("SELECT Id_Parcelle FROM Recolte WHERE Id_Recolte = %s" )
+    else:
+        Id_Parcelle = Id_Parcelle_form
+
+    Nom_Parcelle_form = request.form.get('Nom Parcelle', '')
+    # Si la valeur du champ n'a pas changé, récupérer celle précédente
+    if Nom_Parcelle_form == ' ':
+        Nom_Parcelle = mycursor.execute("SELECT Nom_Parcelle FROM Parcelle WHERE Id_Parcelle = %s" )
+    else:
+        Nom_Parcelle = Nom_Parcelle_form
+
+    Surface_form = request.form.get('Surface', '')
+    # Si la valeur du champ n'a pas changé, récupérer celle précédente
+    if Surface_form == ' ':
+        Surface = mycursor.execute("SELECT Surface FROM Parcelle WHERE Surface = %s")
+    else:
+        Surface = Surface_form
+
+
+    Id_FruitLegume_form = request.form.get('Id_FruitLegume', '')
+    # Si la valeur du champ n'a pas changé, récupérer celle précédente
+    if Id_FruitLegume_form == ' ':
+        Id_FruitLegume = mycursor.execute("SELECT Id_plante FROM Parcelle WHERE Id_ = %s")
+    else:
+        Id_FruitLegume = Id_FruitLegume_form
+
+
+    message = (u'Parcelle modifier id : ' + Id_Parcelle +
+               ' --Nom : ' + Id_FruitLegume + ' --surface : ' + Surface + ' --id_plante : ' + Id_Plante)
+    print(message)
+    flash(message, 'alert-success')
+    return redirect(url_for('show_recolte'))
+
+
