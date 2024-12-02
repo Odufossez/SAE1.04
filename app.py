@@ -367,19 +367,23 @@ def delete_parcelle():
     
     Id_Parcelle = request.args.get('Id_Parcelle', '')
 
-    plante_vide = mycursor.execute("SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s;", Id_Parcelle)
-    plante_vide = str(plante_vide)#conversion pour comparaison
+    # RÉCUPÉRATION DE LA VALEUR DE LA PLANTE
+    mycursor.execute("SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s;", (Id_Parcelle,))
+    plante_vide = mycursor.fetchone()
+    plante_vide = str(plante_vide)
+    plante_vide = plante_vide.find("None")
 
-    if (plante_vide == 'NULL'):
-        flash(u'Une parcelle ne peut pas être supprimée: ' + Id_Parcelle , 'alerte-warning')
-    else :
+    if plante_vide == -1: #si la plante est vide
+        flash(u'Une parcelle ne peut pas être supprimée, des plantes sont actuellement plantées dessus: '
+              + Id_Parcelle, 'alerte-warning')
+    else:
         id_delete = request.args.get('Id_Parcelle', '')
         tuple_delete = (id_delete,)
         sql = '''DELETE FROM Parcelle WHERE Id_Parcelle = %s;'''
         mycursor.execute(sql, tuple_delete)
         get_db().commit()
         flash(u'Une parcelle a été supprimée : ' + id_delete, 'alerte-warning')
-        
+
     return redirect('/parcelle/show')
 
 
