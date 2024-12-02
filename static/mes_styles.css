@@ -90,6 +90,7 @@ a:hover{
 }
 
 body {
+    filter: brightness(80%);
     background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxbn1GqdUhvKzvTEICB37eyE3Qu8UYYdxv9w&s'); /* Chemin relatif vers votre image */
     background-size: auto;
     background-repeat: repeat; /* Pas de répétition */
