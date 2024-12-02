@@ -13,7 +13,7 @@ import pymysql.cursors
 def get_db():
     if 'db' not in g:
         g.db = pymysql.connect(
-            host='localhost', #mettre "serveurmsyql"
+            host='localhost', #mettre "serveurmysql"
             user="root", #"odufosse"
             password="mdproot", #"mdp"
             database="oscar_data", #"BDD_odufosse_tp"
@@ -166,7 +166,7 @@ def valid_edit_recolte():
 
     # Récupération de l'ancienne valeur de Id_Parcelle
     Id_Parcelle_DB=mycursor.execute("SELECT Id_Parcelle FROM Recolte WHERE Id_Recolte = %s;", (Id_Recolte,))
-    
+
     # Vérifier si Id_Parcelle a changé
     if Id_Parcelle_DB != Id_Parcelle:
         Id_FruitLegume=mycursor.execute("SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s;", (Id_Parcelle,))
@@ -209,6 +209,34 @@ def delete_recolte():
 
     flash(u'Une récolte a été supprimée : ' + id_delete , 'alerte-warning')
     return redirect('/recolte/show')
+
+@app.route('/recolte/filtre' , methods=['GET'])
+def filtre_recolte():
+    mycursor = get_db().cursor()
+
+    sql = ''' SELECT Recolte.Id_Recolte , Adherent.NomPrenom as Nom, Parcelle.Nom_Parcelle as Parcelle , 
+        Recolte.Date_Recolte , Libelle_FruitLegume as Plante, Recolte.Quantite as Quantite FROM Recolte
+        LEFT JOIN Adherent on Recolte.Id_Adherent = Adherent.Id_Adherent
+        RIGHT JOIN Fruits_Legumes_et_aromate on Recolte.Id_plante = Fruits_Legumes_et_aromate.Id_FruitLegume
+        RIGHT JOIN Actions on Recolte.Id_Actions = Actions.Id_Actions
+        JOIN Parcelle on Recolte.Id_Parcelle = Parcelle.Id_Parcelle
+        WHERE Actions.Id_Actions = 2; '''
+    mycursor.execute(sql)
+    Recoltes = mycursor.fetchall()
+
+    #CALCUL POIDS TOTAL
+    sql = ''' SELECT sum(Recolte.Quantite) AS poids_recolte FROM Recolte'''
+    mycursor.execute(sql)
+    poids_recolte = mycursor.fetchone()
+
+    #CALCUL POIDS DE PASTÈQUE
+    sql = ''' SELECT sum(Recolte.Quantite) AS poids_pdt FROM Recolte WHERE Id_plante = 1;'''
+    mycursor.execute(sql)
+    poids_pdt = mycursor.fetchone()
+
+
+    return render_template('recolte/filtre_recolte.html' , Recoltes = Recoltes ,
+                           poids_recolte = poids_recolte , poids_pdt = poids_pdt)
 
 
 #----------Parcelle----------------------------------------------
@@ -277,24 +305,20 @@ def valid_add_parcelle():
 def edit_parcelle():
     mycursor = get_db().cursor()
 
-    idParcelle = request.args.get('Id_Parcelle', '')
-    plante_vide = mycursor.execute("SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s", idParcelle)
+    Id_Parcelle = request.args.get('Id_Parcelle', '')
+
+    # RÉCUPÉRATION DE LA VALEUR DE LA PLANTE
+    plante_vide = mycursor.execute("SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s", (Id_Parcelle,))
     plante_vide = str(plante_vide)
 
-    #si la plante est vide, la récupération de la ligne n'est pas la même pour éviter des champs vides
-    if plante_vide == '':
-        #Récupération de la ligne dans la DB
-        sql = ''' SELECT Parcelle.Id_Parcelle, Parcelle.Nom_Parcelle, Parcelle.Surface FROM Parcelle
-        WHERE Parcelle.Id_Parcelle = %s ;'''
+    if plante_vide == "":
+        sql = '''SELECT Id_Parcelle , Nom_Parcelle , Surface FROM Parcelle WHERE Id_Parcelle = %s'''
     else:
-        # Récupération de la ligne dans la DB
-        sql = ''' SELECT Parcelle.Id_Parcelle, Parcelle.Nom_Parcelle, Parcelle.Surface,
-                Parcelle.Plante_id , Fruits_Legumes_et_aromate.Libelle_FruitLegume , Fruits_Legumes_et_aromate.Id_FruitLegume
-                FROM Parcelle
-                RIGHT JOIN Fruits_Legumes_et_aromate on Parcelle.Plante_id = Fruits_Legumes_et_aromate.Id_FruitLegume
-                WHERE Parcelle.Id_Parcelle = %s ;'''
+        sql = ''' SELECT * FROM Parcelle
+        JOIN Fruits_Legumes_et_aromate on Parcelle.Plante_id = Fruits_Legumes_et_aromate.Id_FruitLegume
+        WHERE Id_Parcelle = %s'''
 
-    mycursor.execute(sql , (idParcelle,))
+    mycursor.execute(sql , (Id_Parcelle,))
     Parcelle = mycursor.fetchone()
 
     # RECUPERATION DE LA LISTE DÉROULANTE DES PLANTES
@@ -309,31 +333,14 @@ def edit_parcelle():
 def valid_edit_parcelle():
     mycursor = get_db().cursor()
 
-    Id_Parcelle = request.args.get('Id_Parcelle', '') #ne change jamais
+    Id_Parcelle = request.form.get('Id_Parcelle', '') #ne change jamais
+    Nom_Parcelle= request.form.get('Nom_Parcelle', '')
+    Surface = request.form.get('Surface', '')
+    Id_FruitLegume= request.form.get('Id_FruitLegume', '')
 
-    Nom_Parcelle_form = request.form.get('Nom_Parcelle', '')
-    # Si la valeur du champ n'a pas changé, récupérer celle précédente
-    if Nom_Parcelle_form == ' ':
-        Nom_Parcelle = mycursor.execute("SELECT Nom_Parcelle FROM Parcelle WHERE Id_Parcelle = %s;", Id_Parcelle)
-    else:
-        Nom_Parcelle = Nom_Parcelle_form
-
-    Surface_form = request.form.get('Surface', '')
-    # Si la valeur du champ n'a pas changé, récupérer celle précédente
-    if Surface_form == ' ':
-        Surface = mycursor.execute("SELECT Surface FROM Parcelle WHERE Surface = %s;",Id_Parcelle)
-    else:
-        Surface = Surface_form
-
-    Id_FruitLegume_form = request.form.get('Id_FruitLegume', '')
-    # Si la valeur du champ n'a pas changé, récupérer celle précédente
-    if Id_FruitLegume_form == ' ':
-        Id_FruitLegume = mycursor.execute("SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s;", Id_Parcelle)
-        Id_FruitLegume = str(Id_FruitLegume)
-    elif Id_FruitLegume_form == 'vide':
+    # Si la valeur du champ est "vide" mettre NULL
+    if Id_FruitLegume == 'vide':
         Id_FruitLegume = 'NULL'
-    else:
-        Id_FruitLegume = Id_FruitLegume_form
 
     #mise à jour de la table PARCELLE
     tuple_update = (Nom_Parcelle,Surface,Id_FruitLegume,Id_Parcelle)
@@ -353,8 +360,10 @@ def delete_parcelle():
     mycursor = get_db().cursor()
     
     Id_Parcelle = request.args.get('Id_Parcelle', '')
+
     plante_vide = mycursor.execute("SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s;", Id_Parcelle)
     plante_vide = str(plante_vide)#conversion pour comparaison
+
     if (plante_vide == 'NULL'):
         flash(u'Une parcelle ne peut pas être supprimée: ' + Id_Parcelle , 'alerte-warning')
     else :

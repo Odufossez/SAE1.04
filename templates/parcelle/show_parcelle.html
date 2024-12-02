@@ -25,7 +25,12 @@
                <td>{{ ligne.Plante }}</td>
 
                <td>
-                   <a class= "lien_tab" href="/parcelle/edit?Id_Parcelle={{ ligne.Id_Parcelle }}">Éditer</a>
+                   {% if ligne.Id_Parcelle %}
+                        <a class="lien_tab" href="/parcelle/edit?Id_Parcelle={{ ligne.Id_Parcelle }}">Éditer</a>
+                    {% else %}
+                        <span>Impossible d'éditer</span>
+                   {% endif %}
+
                    <a class= "lien_tab" href="/parcelle/delete?Id_Parcelle={{ ligne.Id_Parcelle }}" >Supprimer</a>
                </td>
            </tr>

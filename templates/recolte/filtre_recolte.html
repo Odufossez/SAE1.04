@@ -1,15 +1,16 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-    <title>Afficher les récoltes</title>
+    <title>Afficher les parcelles</title>
 {% endblock %}
 
 {% block body %}
-<h3>Récoltes</h3>
-<a href="/recolte/add">Ajouter une récolte</a> <a href="/recolte/filtre"> Filtrer le tableau</a>
-<br><br>
+<h3>États des récoltes</h3>
+<form action="/recolte/filtre" method="GET">
 
-<table class="table">
+    <h2>Il y a {{ poids_recolte.poids_recolte }} Kg qui ont été récolté dont {{poids_pdt.poids_pdt }} Kg de Pastèque</h2>
+
+    <table class="table">
     <thead class="thead-dark">
         <tr>
             <th>ID</th><th>Nom</th><th>Numéro de parcelle</th><th>Date</th>
@@ -17,8 +18,8 @@
         </tr>
     </thead>
     <tbody>
-    {% if recoltes | length >= 1 %}
-        {% for ligne in recoltes %}
+    {% if Recoltes | length >= 1 %}
+        {% for ligne in Recoltes %}
            <tr>
                <td> {{ ligne.Id_Recolte }}</td>
                <td> {{ ligne.Nom }}</td>
@@ -26,20 +27,21 @@
                <td> {{ ligne.Date_Recolte }} </td>
                <td>{{ ligne.Quantite }}</td>
                <td>{{ ligne.Plante }}</td>
-
-               <td>
-                   <a class= "lien_tab" href="/recolte/edit?Id_Recolte={{ ligne.Id_Recolte }}">Éditer</a>
-                   <a class= "lien_tab" href="/recolte/delete?Id_Recolte={{ ligne.Id_Recolte }}" >Supprimer</a>
-               </td>
            </tr>
         {% endfor %}
     {% else %}
             <tr>
                   <td>
-                      Pas de récolte
+                      Pas de résultat
                   </td>
            </tr>
     {% endif %}
     </tbody>
-</table>
+</form>
+<br>
+<hr>
+
+
+
+
 {% endblock %}
