@@ -10,8 +10,8 @@ table ,tr {
   width: 100%;
     height: 50px;
   border-collapse: collapse;
-  border: 1px solid blue;
-  background-color: lightblue;
+  border: 1px solid darkgreen;
+  background-color: lightgreen;
 }
 
 tr{
@@ -21,7 +21,7 @@ tr{
 a:not(.lien_tab, .lien_nav){
     width:150px;
     height: 30px;
-    background-color:cornflowerblue;
+    background-color:lightblue;
     border: 1px mediumpurple groove ;
     text-align:center;
     vertical-align: middle;
@@ -32,13 +32,22 @@ a:not(.lien_tab, .lien_nav){
     text-decoration: none;
 }
 
-.lien_tab, .lien_nav{
+.lien_tab{
     text-decoration: none;
-    color: darkblue;
+    color: white;
+    border-radius: 10px;
+    padding: 5px;
+    background-color: darkgreen;
+}
+
+.lien_nav {
+    text-decoration: none;
+    color: darkgreen;
 }
 
 a:hover{
-    background-color: grey;
+    background-color: lightblue;
+    color: black;
 }
 
 .menu{
@@ -57,7 +66,7 @@ a:hover{
 }
 
 .card{
-    border: 2px blue dotted;
+    border: 2px green dotted;
     padding-bottom: 10px;
     background-color: lightgray;
 }
@@ -78,4 +87,11 @@ a:hover{
 }
 .alert-success {
     background-color: #bdfdbd;
+}
+
+body {
+    background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxbn1GqdUhvKzvTEICB37eyE3Qu8UYYdxv9w&s'); /* Chemin relatif vers votre image */
+    background-size: auto;
+    background-repeat: repeat; /* Pas de répétition */
+    background-attachment: fixed; /* L'image reste fixe lors du défilement */
 }
