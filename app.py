@@ -308,10 +308,12 @@ def edit_parcelle():
     Id_Parcelle = request.args.get('Id_Parcelle', '')
 
     # RÉCUPÉRATION DE LA VALEUR DE LA PLANTE
-    plante_vide = mycursor.execute("SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s", (Id_Parcelle,))
+    mycursor.execute("SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s;", (Id_Parcelle,))
+    plante_vide = mycursor.fetchone()
     plante_vide = str(plante_vide)
+    plante_vide = plante_vide.find("None")
 
-    if plante_vide == "":
+    if plante_vide != -1:
         sql = '''SELECT Id_Parcelle , Nom_Parcelle , Surface FROM Parcelle WHERE Id_Parcelle = %s'''
     else:
         sql = ''' SELECT * FROM Parcelle
@@ -334,6 +336,10 @@ def valid_edit_parcelle():
     mycursor = get_db().cursor()
 
     Id_Parcelle = request.form.get('Id_Parcelle', '') #ne change jamais
+    if not Id_Parcelle:
+        flash("Id_Parcelle manquant", "alert-danger")
+        return redirect(url_for('show_parcelle'))
+
     Nom_Parcelle= request.form.get('Nom_Parcelle', '')
     Surface = request.form.get('Surface', '')
     Id_FruitLegume= request.form.get('Id_FruitLegume', '')
