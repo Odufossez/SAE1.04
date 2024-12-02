@@ -8,7 +8,7 @@
 <h2> Modifier une récolte </h2>
 <form method="post" action="/recolte/edit">
     <fieldset>
-        <legend> Modifier une récolte </legend>
+        <legend> Modifier la récolte {{Recolte.Id_Recolte}}</legend>
 
         <input type="hidden" name="Id_Recolte" size="18" value="{{ Recolte.Id_Recolte }}" id="Id_Recolte">
 
@@ -30,14 +30,9 @@
         {% endfor %}
         </select> <br>
 
-        <label for="Id_FruitLegume"> Plante </label>
-        <select name = "Id_FruitLegume" id="Id_FruitLegume">
-        {% for plante in Fruits_Legumes_et_aromate %}
-            <option value="{{ plante.Id_FruitLegume }}"
-            {% if Recolte.Id_plante is defined and plante.Id_FruitLegume ==
-            Recolte.Id_plante %}selected{%endif%}> {{ plante.Libelle_FruitLegume }} </option>
-        {% endfor %}
-        </select>
+        <label for="Id_FruitLegume"> Plante: </label>
+        <input name="Id_FruitLegume" id="Id_FruitLegume" type="hidden" value="{{Recolte.Id_plante}}">
+        {{Recolte.Libelle_FruitLegume}}<br>
 
         <label for="date"> Date de la récolte </label>
         <input id="date" type="date" name="Date_Recolte" value="{{Recolte.Date_Recolte}}"

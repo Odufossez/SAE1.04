@@ -77,6 +77,11 @@ def valid_add_recolte():
     Quantite = request.form.get('Quantite', '')
     Recolte_complete = request.form.get('Recolte_complete', '') #indicateur de si la parcelle est vide ou non
 
+    # Récupération de la plante sur la parcelle sélectionnée
+    tuple_plante = (Id_Parcelle)
+    sql = ''' SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s '''
+    id_plante = mycursor.execute(sql, tuple_plante)
+
     # si la récolte vide la parcelle alors on met à jour la table parcelle
     if (Recolte_complete == "oui_recolte_complete"):
 
@@ -89,11 +94,6 @@ def valid_add_recolte():
         get_db().commit()
         mycursor.execute("ALTER TABLE Parcelle ENABLE KEYS;",)
         mycursor.execute("SET FOREIGN_KEY_CHECKS=1;",)
-
-    #Récupération de la plante sur la parcelle sélectionnée
-    tuple_plante = (Id_Parcelle)
-    sql = ''' SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s '''
-    id_plante = mycursor.execute(sql, tuple_plante)
 
     #Conversion en string
     id_plante = str(id_plante)
@@ -115,27 +115,27 @@ def valid_add_recolte():
 def edit_recolte():
     mycursor = get_db().cursor()
 
-    idRecolte = request.args.get('Id_Recolte', '')
+    Id_Recolte = request.args.get('Id_Recolte', '')
 
     #Récupération de la ligne dans la DB
     sql = ''' SELECT Adherent.NomPrenom, Adherent.Id_Adherent, Recolte.Id_Parcelle,
         Recolte.Date_Recolte , Parcelle.Nom_Parcelle, Recolte.Id_plante,
-        Fruits_Legumes_et_aromate.Libelle_FruitLegume, Recolte.Quantite
+        Fruits_Legumes_et_aromate.Libelle_FruitLegume, Recolte.Quantite , Recolte.Id_Recolte
         FROM Recolte
         LEFT JOIN Adherent on Recolte.Id_Adherent = Adherent.Id_Adherent
         RIGHT JOIN Fruits_Legumes_et_aromate on Recolte.Id_plante = Fruits_Legumes_et_aromate.Id_FruitLegume
         JOIN Parcelle on Recolte.Id_Parcelle = Parcelle.Id_Parcelle
         WHERE Recolte.Id_Recolte = %s ;'''
 
-    mycursor.execute(sql , (idRecolte,))
-    recolte = mycursor.fetchone()
+    mycursor.execute(sql , (Id_Recolte,))
+    Recolte = mycursor.fetchone()
 
     # RECUPERATION DES LISTES DÉROULANTES
     sql = '''  SELECT Id_Adherent , Adherent.NomPrenom FROM Adherent; '''
     mycursor.execute(sql)
     adherents = mycursor.fetchall()
 
-    sql = '''  SELECT Parcelle.Id_Parcelle , Parcelle.Nom_Parcelle FROM Parcelle; '''
+    sql = '''  SELECT Parcelle.Id_Parcelle , Parcelle.Nom_Parcelle FROM Parcelle WHERE Plante_id IS NOT NULL; '''
     mycursor.execute(sql)
     parcelles = mycursor.fetchall()
 
@@ -143,86 +143,58 @@ def edit_recolte():
     mycursor.execute(sql)
     fruits_legumes_et_aromate = mycursor.fetchall()
 
-    return render_template('recolte/edit_recolte.html' , Recolte = recolte , Adherents = adherents ,
+    return render_template('recolte/edit_recolte.html' , Recolte = Recolte , Adherents = adherents ,
                            Parcelles = parcelles , Fruits_Legumes_et_aromate = fruits_legumes_et_aromate)
 
 @app.route('/recolte/edit' , methods=['POST'])
 def valid_edit_recolte():
     mycursor = get_db().cursor()
 
-    Id_Recolte = request.args.get('Id_Recolte', '')
+    # Attributs qui ne sont pas modifiables
+    Id_Recolte = request.form.get('Id_Recolte', '')
+    if not Id_Recolte:
+        flash("Id_Recolte manquant", "alert-danger")
+        return redirect(url_for('show_recolte'))
 
-    idAdherent_form = request.form.get('Id_Adherent', '')
-    # Si la valeur du champ n'a pas changé, récupérer celle précédente
-    if idAdherent_form == ' ':
-        idAdherent =  mycursor.execute("SELECT Id_Adherent FROM Recolte WHERE Id_Recolte = %s" , Id_Recolte)
+    # Attributs modifiables
+    Id_FruitLegume = request.form.get('Id_FruitLegume', '')
+    idAdherent = request.form.get('Id_Adherent', '')
+    Id_Parcelle = request.form.get('Id_Parcelle', '')
+    Date = request.form.get('Date_Recolte', '')
+    Quantite = request.form.get('Quantite', '')
+    Recolte_complete = request.form.get('Recolte_complete', '')
+
+    # Récupération de l'ancienne valeur de Id_Parcelle
+    Id_Parcelle_DB=mycursor.execute("SELECT Id_Parcelle FROM Recolte WHERE Id_Recolte = %s;", (Id_Recolte,))
+    
+    # Vérifier si Id_Parcelle a changé
+    if Id_Parcelle_DB != Id_Parcelle:
+        Id_FruitLegume=mycursor.execute("SELECT Plante_id FROM Parcelle WHERE Id_Parcelle = %s;", (Id_Parcelle,))
+
+    # Mettre à jour la parcelle selon si la récolte est complète ou non
+    if Recolte_complete == 'oui_recolte_complete':
+        mycursor.execute("UPDATE Parcelle SET Plante_id = NULL WHERE Id_Parcelle = %s;", (Id_Parcelle,))
     else:
-        idAdherent = idAdherent_form
+        mycursor.execute("UPDATE Parcelle SET Plante_id = %s WHERE Id_Parcelle = %s;", (Id_FruitLegume, Id_Parcelle))
 
-    Id_Parcelle_form = request.form.get('Id_Parcelle', '')
-    #Si la valeur du champ n'a pas changé, récupérer celle précédente
-    if Id_Parcelle_form == ' ':
-        Id_Parcelle = mycursor.execute("SELECT Id_Parcelle FROM Recolte WHERE Id_Recolte = %s" , Id_Recolte)
-    else:
-        Id_Parcelle = Id_Parcelle_form
+    get_db().commit()  # Validation des modifications sur la parcelle
 
-    Date_form = request.form.get('Date_Recolte', '')
-    # Si la valeur du champ n'a pas changé, récupérer celle précédente
-    if Date_form == ' ':
-        Date = mycursor.execute("SELECT Date_Recolte FROM Recolte WHERE Id_Recolte = %s" , Id_Recolte)
-    else:
-        Date = Date_form
-
-    Id_FruitLegume_form = request.form.get('Id_FruitLegume', '')
-    # Si la valeur du champ n'a pas changé, récupérer celle précédente
-    if Id_FruitLegume_form == ' ':
-        Id_FruitLegume = mycursor.execute("SELECT Id_plante FROM Recolte WHERE Id_Recolte = %s" , Id_Recolte)
-    else:
-        Id_FruitLegume = Id_FruitLegume_form
-
-    Quantite_form = request.form.get('Quantite', '')
-    # Si la valeur du champ n'a pas changé, récupérer celle précédente
-    if Quantite_form == ' ':
-        Quantite = mycursor.execute("SELECT Quantite FROM Recolte WHERE Id_Recolte = %s" , Id_Recolte)
-    else:
-        Quantite = Quantite_form
-
+    # Mettre à jour la récolte
     tuple_update = (idAdherent, Id_Parcelle, Date, Quantite, Id_FruitLegume, Id_Recolte)
-    sql = ''' UPDATE Recolte SET Id_Adherent = %s , Id_Parcelle = %s , Date_Recolte = %s , Quantite = %s , 
-        Id_plante = %s
-        WHERE Id_Recolte = %s; '''
+    sql = '''UPDATE Recolte
+        SET Id_Adherent = %s, Id_Parcelle = %s, Date_Recolte = %s, Quantite = %s, Id_plante = %s
+        WHERE Id_Recolte = %s;'''
     mycursor.execute(sql, tuple_update)
-    get_db().commit()
+    get_db().commit()  # Validation des modifications sur la récolte
 
-    Recolte_complete = request.form.get('Recolte_complete', '')  # indicateur de si la parcelle est vide ou non
-    #Vide la parcelle si besoin else ajuste la valeur des plantes dessus au cas où
-    if (Recolte_complete == 'oui_recolte_complete'):
-        mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
-        mycursor.execute("ALTER TABLE Parcelle DISABLE KEYS;", )
-
-        tuple_update = (Id_Parcelle)
-        sql = '''  UPDATE Parcelle SET Plante_id = NULL WHERE Id_Parcelle = %s; '''
-        mycursor.execute(sql, tuple_update)
-        get_db().commit()
-        mycursor.execute("ALTER TABLE Parcelle ENABLE KEYS;", )
-        mycursor.execute("SET FOREIGN_KEY_CHECKS=1;", )
-    else:
-        mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
-        mycursor.execute("ALTER TABLE Parcelle DISABLE KEYS;", )
-
-        tuple_update = (Id_FruitLegume , Id_Parcelle)
-        sql = '''  UPDATE Parcelle SET Plante_id = %s WHERE Id_Parcelle = %s; '''
-        mycursor.execute(sql, tuple_update)
-        get_db().commit()
-        mycursor.execute("ALTER TABLE Parcelle ENABLE KEYS;", )
-        mycursor.execute("SET FOREIGN_KEY_CHECKS=1;", )
-
-
-    message = (u'Récolte modifiée :' + Id_Recolte + 'Adhérent : ' + idAdherent + ' --Parcelle : ' + Id_Parcelle +
-               ' --Plante : ' + Id_FruitLegume + ' --Date : ' + Date + ' --Quantite : ' + Quantite)
+    # Message de confirmation
+    message = (f"Récolte modifiée : {Id_Recolte} - Adhérent : {idAdherent} - Parcelle : {Id_Parcelle} "
+               f"- Plante : {Id_FruitLegume} - Date : {Date} - Quantité : {Quantite}")
     print(message)
     flash(message, 'alert-success')
+
     return redirect(url_for('show_recolte'))
+
 
 @app.route('/recolte/delete' , methods=['GET'])
 def delete_recolte():
