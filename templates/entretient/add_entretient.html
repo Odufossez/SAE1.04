@@ -1,10 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'layout.html' %}
 
-</body>
-</html>
+{% block title %}
+ <title> Ajouter un entretient </title>
+{% endblock %}
+
+{% block body %}
+<h2> Ajouter un entretient </h2>
+<form method="post" action="/entretient/add">
+    <fieldset>
+        <legend> Créer un entretient </legend>
+
+        <label for="Id_Adherent"> Adhérents </label>
+        <select name="Id_Adherent" required>
+        <option value="">Sélectionner un adhérent</option>
+            {% for adherent in Adherent %}
+            <option value="{{ adherent.Id_Adherent }}"> {{ adherent.NomPrenom }}</option>
+            {% endfor %}
+        </select> <br>
+
+        <label for="Id_Compost"> Compost </label>
+        <select name="Id_Compost" id="Id_Compost" required>
+        <option value="">Sélectionner une benne</option>
+            {% for benne in Composts %}
+            <option value="{{ benne.Id_Compost }}"> {{ benne.Localisation }}</option>
+            {% endfor %}
+        </select> <br>
+
+        <label for="Id_Actions"> Actions </label>
+        <select name="Id_Actions" id="Id_Actions" required>
+        <option value="">Sélectionner une action</option>
+            {% for act in Actions %}
+            <option value="{{ act.Id_Actions }}"> {{ act.Libelle_action }}</option>
+            {% endfor %}
+        </select> <br>
+
+
+        <label for="date"> Date de l'entretient </label>
+        <input id="date" type="date" name="Date_Entretient" size="25" value=""
+               placeholder="" required>
+
+        <label for="quantite"></label>
+        <input id="quantite" type="number" name="Quantite" min="0.0" max="99.9" step="0.01" value=""
+               placeholder="Kg" required> <br>
+
+
+
+        <input type="submit" value="Creer" name="Valider">
+    </fieldset>
+</form>
+{% endblock %}

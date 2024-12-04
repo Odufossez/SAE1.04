@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    <title>Afficher les entretients</title>
+{% endblock %}
+
+{% block body %}
+<h3>Entretients</h3>
+<a href="/entretient/add">Ajouter un entretient</a>
+<br><br>
+
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th><th>Nom de l'adhérent</th><th>Numéro de benne</th><th>Date</th>
+            <th>Action effectuée</th><th>Quantité de compost</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% if entretients | length >= 1 %}
+        {% for ligne in entretients %}
+           <tr>
+               <td> {{ ligne.Id_Entretient }}</td>
+               <td> {{ ligne.NomPrenom }}</td>
+               <td> {{ ligne.Id_Compost }} </td>
+               <td> {{ ligne.Date_Entretient }} </td>
+               <td>{{ ligne.Libelle_action }}</td>
+               <td>{{ ligne.Quantite }}</td>
+
+               <td>
+                   <a class= "lien_tab" href="/entretient/edit?Id_Entretient={{ ligne.Id_Entretient }}">Éditer</a>
+                   <a class= "lien_tab" href="/entretient/delete?Id_Entretient={{ ligne.Id_Entretient }}">Supprimer</a>
+               </td>
+           </tr>
+        {% endfor %}
+    {% else %}
+            <tr>
+                  <td>
+                      Pas d'entretient
+                  </td>
+           </tr>
+    {% endif %}
+    </tbody>
+</table>
+{% endblock %}

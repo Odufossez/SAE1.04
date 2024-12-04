@@ -188,12 +188,12 @@ def valid_edit_recolte():
     get_db().commit()  # Validation des modifications sur la récolte
 
     # Message de confirmation
-    message = (f"Récolte modifiée : {Id_Recolte} - Adhérent : {idAdherent} - Parcelle : {Id_Parcelle} "
-               f"- Plante : {Id_FruitLegume} - Date : {Date} - Quantité : {Quantite}")
+    message = (u'Recolte modifiée : Id : ' + Id_Recolte + ' --Parcelle : ' + Id_Parcelle + ' --Plante : '
+               + Id_FruitLegume + ' --Date : ' + Date + ' --Quantite : ' + Quantite + ' --Adhérent : ' + idAdherent)
     print(message)
     flash(message, 'alert-success')
 
-    return redirect(url_for('show_recolte'))
+    return redirect(url_for('show_entretient'))
 
 
 @app.route('/recolte/delete' , methods=['GET'])
@@ -214,6 +214,10 @@ def delete_recolte():
 def filtre_recolte():
     mycursor = get_db().cursor()
 
+    Plantes_check = request.args.getlist('Plantes_check', None)
+
+    print("Plantes check = " , Plantes_check)
+
     sql = ''' SELECT Recolte.Id_Recolte , Adherent.NomPrenom as Nom, Parcelle.Nom_Parcelle as Parcelle , 
         Recolte.Date_Recolte , Libelle_FruitLegume as Plante, Recolte.Quantite as Quantite FROM Recolte
         LEFT JOIN Adherent on Recolte.Id_Adherent = Adherent.Id_Adherent
@@ -224,19 +228,19 @@ def filtre_recolte():
     mycursor.execute(sql)
     Recoltes = mycursor.fetchall()
 
+    sql = ''' SELECT * FROM Fruits_Legumes_et_aromate'''
+    mycursor.execute(sql)
+    Plantes = mycursor.fetchall()
+
     #CALCUL POIDS TOTAL
     sql = ''' SELECT sum(Recolte.Quantite) AS poids_recolte FROM Recolte'''
     mycursor.execute(sql)
     poids_recolte = mycursor.fetchone()
 
-    #CALCUL POIDS DE PASTÈQUE
-    sql = ''' SELECT sum(Recolte.Quantite) AS poids_pdt FROM Recolte WHERE Id_plante = 1;'''
-    mycursor.execute(sql)
-    poids_pdt = mycursor.fetchone()
 
 
-    return render_template('recolte/filtre_recolte.html' , Recoltes = Recoltes ,
-                           poids_recolte = poids_recolte , poids_pdt = poids_pdt)
+    return render_template('recolte/filtre_recolte.html' , Recoltes = Recoltes , Plantes = Plantes ,
+                           poids_recolte = poids_recolte)
 
 
 #----------Parcelle----------------------------------------------
@@ -386,4 +390,145 @@ def delete_parcelle():
 
     return redirect('/parcelle/show')
 
+#----------- ENTRETIENT ----------------------------------
 
+@app.route('/entretient/show' , methods=['GET'])
+def show_entretient():
+    mycursor = get_db().cursor()
+
+    sql = ''' SELECT Entretient.Id_Entretient , Adherent.NomPrenom, Id_Compost, 
+    Entretient.Date_Entretient, Libelle_action ,Entretient.Quantite FROM Entretient
+    LEFT JOIN Adherent on Entretient.Id_Adherent = Adherent.Id_Adherent
+    RIGHT JOIN Actions on Entretient.Id_Actions = Actions.Id_Actions
+    WHERE (Actions.Id_Actions = 3 OR Actions.Id_Actions = 4 OR Actions.Id_Actions = 6) AND Id_Entretient IS NOT NULL; '''
+
+    mycursor.execute(sql)
+    entretients = mycursor.fetchall()
+
+    return render_template('entretient/show_entretient.html' , entretients = entretients)
+
+@app.route('/entretient/add' , methods=['GET'])
+def add_entretient():
+    mycursor = get_db().cursor()
+
+    # Liste des adhérents
+    sql = '''  SELECT Adherent.Id_Adherent , Adherent.NomPrenom FROM Adherent; '''
+    mycursor.execute(sql)
+    Adherents = mycursor.fetchall()
+
+    # Liste des composts
+    sql = '''  SELECT * FROM Compost; '''
+    mycursor.execute(sql)
+    Composts = mycursor.fetchall()
+
+    # Liste des actions
+    sql = ''' SELECT * FROM Actions WHERE 
+    Actions.Id_Actions = 3 OR Actions.Id_Actions = 4 OR Actions.Id_Actions = 6;'''
+    mycursor.execute(sql)
+    Actions = mycursor.fetchall()
+
+    return render_template('entretient/add_entretient.html' , Adherent = Adherents , Composts = Composts,
+                           Actions = Actions)
+
+@app.route('/entretient/add' , methods=['POST'])
+def valid_add_entretient():
+    mycursor = get_db().cursor()
+
+    idAdherent = request.form.get('Id_Adherent', '')
+    Id_Compost = request.form.get('Id_Compost', '')
+    Date = request.form.get('Date_Entretient', '')
+    Quantite = request.form.get('Quantite', '')
+    Actions = request.form.get('Id_Actions', '')
+
+    #Insertion dans la table récolte
+    tuple_insert = (idAdherent , Id_Compost ,Date, Actions , Quantite)
+    sql = ''' INSERT INTO Entretient (Id_Adherent, Id_Compost, Date_Entretient , Id_Actions , Quantite) VALUES 
+    (%s , %s , %s , %s , %s);'''
+    mycursor.execute(sql, tuple_insert)
+    get_db().commit()
+
+    message = (u'Entretient ajouté : Adhérent : ' + idAdherent + ' --Compost : ' + Id_Compost +
+               ' --Quantité : ' + Quantite + ' --Date : ' + Date + ' --Actions : ' + Actions)
+    print(message)
+    flash(message, 'alert-success')
+    return redirect(url_for('show_entretient'))
+
+@app.route('/entretient/edit' , methods=['GET'])
+def edit_entretient():
+    mycursor = get_db().cursor()
+
+    Id_Entretient = request.args.get('Id_Entretient', '')
+
+    #Récupération de la ligne dans la DB
+    sql = ''' SELECT Adherent.NomPrenom, Adherent.Id_Adherent, Entretient.Id_Compost,
+        Date_Entretient , Actions.Id_Actions, Quantite , Libelle_action , Id_Entretient FROM Entretient
+        LEFT JOIN Adherent on Entretient.Id_Adherent = Adherent.Id_Adherent
+        RIGHT JOIN Actions on Actions.Id_Actions = Entretient.Id_Actions
+        WHERE Entretient.Id_Entretient = %s ;'''
+
+    mycursor.execute(sql , (Id_Entretient,))
+    Entretient = mycursor.fetchone()
+
+    # RECUPERATION DES LISTES DÉROULANTES
+    sql = '''  SELECT Id_Adherent , Adherent.NomPrenom FROM Adherent; '''
+    mycursor.execute(sql)
+    Adherents = mycursor.fetchall()
+
+    sql = '''  SELECT * FROM Compost; '''
+    mycursor.execute(sql)
+    Composts = mycursor.fetchall()
+
+    sql = '''  SELECT * FROM Actions WHERE Actions.Id_Actions = 3 OR Actions.Id_Actions = 4 OR Actions.Id_Actions = 6;'''
+    mycursor.execute(sql)
+    Actions = mycursor.fetchall()
+
+    return render_template('entretient/edit_entretient.html' , Entretient = Entretient , Composts = Composts
+                           , Actions = Actions , Adherents = Adherents)
+
+@app.route('/entretient/edit' , methods=['POST'])
+def valid_edit_entretient():
+    mycursor = get_db().cursor()
+
+    # Attributs qui ne sont pas modifiables
+    Id_Entretient = request.form.get('Id_Entretient', '')
+    if not Id_Entretient:
+        flash("Id_Entretient manquant", "alert-danger")
+        return redirect(url_for('show_entretient'))
+
+    # Attributs modifiables
+    idAdherent = request.form.get('Id_Adherent', '')
+    idCompost = request.form.get('Id_Compost', '')
+    Date = request.form.get('Date_Entretient', '')
+    Quantite = request.form.get('Quantite', '')
+    Action = request.form.get('Id_Actions', '')
+
+    # Mettre à jour l'entretient
+    tuple_update = (idAdherent, idCompost, Date, Quantite, Action, Id_Entretient)
+    sql = '''UPDATE Entretient
+        SET Id_Adherent = %s, Id_Compost = %s, Date_Entretient = %s, Quantite = %s, Id_Actions = %s
+        WHERE Id_Entretient = %s;'''
+    mycursor.execute(sql, tuple_update)
+    get_db().commit()  # Validation des modifications
+
+    # Message de confirmation
+    message = (u'Entretient modifié : ' + Id_Entretient + ' --Compost : ' + idCompost + ' --Date : ' + Date +
+               ' --Quantite : ' + Quantite + ' --Actions : ' + Action)
+    print(message)
+    flash(message, 'alert-success')
+
+    return redirect(url_for('show_recolte'))
+
+
+@app.route('/entretient/delete' , methods=['GET'])
+def delete_entretient():
+    mycursor = get_db().cursor()
+
+    id_delete = request.args.get('Id_Entretient', '')
+    tuple_delete = (id_delete,)
+    sql = '''DELETE FROM Entretient WHERE Id_Entretient = %s;'''
+
+    mycursor.execute(sql , tuple_delete)
+    get_db().commit()
+
+    flash(u'Un entretient a été supprimé : ' + id_delete , 'alerte-warning')
+    return redirect('/entretient/show')

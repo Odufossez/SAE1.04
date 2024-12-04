@@ -1,0 +1,54 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+ <title> Modifier un entretient </title>
+{% endblock %}
+
+{% block body %}
+<h2> Modifier un entretient </h2>
+<form method="post" action="/entretient/edit">
+    <fieldset>
+        <legend> Modifier l'entretient {{Entretient.Id_Entretient}}</legend>
+
+        <input type="hidden" name="Id_Entretient" size="18" value="{{ Entretient.Id_Entretient }}" id="Id_Entretient">
+
+        <label for="Adherents"> Adhérents </label>
+        <select name="Id_Adherent" id="Adherents">
+        {% for adherent in Adherents %}
+        <option value="{{ adherent.Id_Adherent }}"
+            {% if Entretient.Id_Adherent is defined and adherent.Id_Adherent == Entretient.Id_Adherent %} selected {% endif %}
+        > {{ adherent.NomPrenom }} </option>
+        {% endfor %}
+        </select> <br>
+
+        <label for="Id_Compost"> Compost </label>
+        <select name="Id_Compost" id="Id_Compost">
+        {% for benne in Composts %}
+            <option value="{{ benne.Id_Compost }}"
+            {% if Entretient.Id_Compost is defined and benne.Id_Compost ==
+            Entretient.Id_Compost %} selected {% endif %}> {{ benne.Localisation }} </option>
+        {% endfor %}
+        </select> <br>
+
+        <label for="Id_Actions"> Actions </label>
+        <select name="Id_Actions" id="Id_Actions">
+        {% for act in Actions %}
+            <option value="{{ act.Id_Actions }}"
+            {% if Entretient.Id_Actions is defined and act.Id_Actions ==
+            Entretient.Id_Actions %} selected {% endif %}> {{ act.Libelle_action }} </option>
+        {% endfor %}
+        </select> <br>
+
+        <label for="date"> Date de l'entretient </label>
+        <input id="date" type="date" name="Date_Entretient" value="{{Entretient.Date_Entretient}}"
+               placeholder="" required>
+
+        <label for="Quantite"></label>
+        <input id="Quantite" type="number" name="Quantite" min="0.0" max="99.9" step="0.01" value="{{Entretient.Quantite}}"
+               placeholder="" required> <br>
+
+
+        <input type="submit" value="Creer" name="Valider">
+    </fieldset>
+</form>
+{% endblock %}
